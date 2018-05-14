@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Remember</string>
+    <string name="preferencesName">My Preferences</string>
+    <string name="start">Start</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
 </resources>
