@@ -146,7 +146,6 @@ class TutorialActivity : AppCompatActivity() {
      */
     private fun changeStatusBarColor() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //val window = window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.statusBarColor = Color.TRANSPARENT
         }
@@ -157,12 +156,11 @@ class TutorialActivity : AppCompatActivity() {
      * View pager adapter
      */
     inner class MyViewPagerAdapter : PagerAdapter() {
-        private var layoutInflater: LayoutInflater? = null
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-            val view = layoutInflater!!.inflate(layouts!![position], container, false)
+            val view = layoutInflater.inflate(layouts!![position], container, false)
             container.addView(view)
 
             return view

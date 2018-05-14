@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F91B1</color>
+    <color name="colorPrimary">#3395ff</color>
     <color name="colorPrimaryDark">#515989</color>
     <color name="colorAccent">#ff4081</color>
 
@@ -9,7 +9,6 @@
     <color name="bg_screen2">#20d2bb</color>
     <color name="bg_screen3">#3395ff</color>
     <color name="bg_screen4">#c873f4</color>
-
 
     <!-- dots inactive colors -->
     <color name="dot_dark_screen1">#d1395c</color>
