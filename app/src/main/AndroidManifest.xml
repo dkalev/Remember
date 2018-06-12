@@ -19,8 +19,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".TutorialActivity"
+        <activity
+            android:name=".TutorialActivity"
             android:theme="@style/NoActionBar" />
+        <activity android:name=".flashcard.CardFlipActivity"
+            android:theme="@style/NoActionBar"></activity>
     </application>
 
 </manifest>
