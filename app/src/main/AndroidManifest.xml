@@ -22,8 +22,14 @@
         <activity
             android:name=".TutorialActivity"
             android:theme="@style/NoActionBar" />
-        <activity android:name=".flashcard.CardFlipActivity"
-            android:theme="@style/NoActionBar"></activity>
+        <activity
+            android:name=".flashcard.CardFlipActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".deck.DecksActivity"
+            android:label="@string/title_activity_decks"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".deck.CreateDeckActivity"></activity>
     </application>
 
 </manifest>

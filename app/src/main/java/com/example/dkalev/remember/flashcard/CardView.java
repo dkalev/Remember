@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -24,6 +25,7 @@ public class CardView extends ConstraintLayout {
     private AnimatorSet mRight_in;
     private AnimatorSet mRight_out;
 
+    private ConstraintLayout mLayout;
     private boolean flipped;
 
     public CardView(@NonNull Context context) {

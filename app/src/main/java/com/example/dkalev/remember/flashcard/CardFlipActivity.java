@@ -1,12 +1,11 @@
 package com.example.dkalev.remember.flashcard;
 
 import android.os.Bundle;
+import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -31,9 +30,6 @@ public class CardFlipActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.cardRecyclerView);
 
-        SnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(mRecyclerView);
-
         mRecyclerView.setAdapter(mCardsAdapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
@@ -42,6 +38,7 @@ public class CardFlipActivity extends AppCompatActivity {
                 return false;
             }
         };
+
         mRecyclerView.setLayoutManager(llm);
 
         mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), mRecyclerView, new RecyclerTouchListener.ClickListener() {
@@ -57,7 +54,7 @@ public class CardFlipActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFling(CardView view, MotionEvent e1, MotionEvent e2, float velocityX,
+            public void onFling(final CardView view, MotionEvent e1, MotionEvent e2, float velocityX,
                                 float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
                 if(cards.size() > 0 && view.isFlipped()) {
@@ -69,10 +66,16 @@ public class CardFlipActivity extends AppCompatActivity {
 
                     flingX.start();
                     flingY.start();
-
-                    cards.remove(0);
-                    mRecyclerView.getAdapter().notifyItemRemoved(0);
-
+                    flingX.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
+                        @Override
+                        public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
+                            cards.remove(0);
+                            mRecyclerView.getAdapter().notifyItemRemoved(0);
+                        }
+                    });
+//                    cards.remove(0);
+//                    mRecyclerView.getAdapter().notifyItemRemoved(0);
+                    //todo open next activity when out of cards
                 }
             }
         }));
