@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -39,8 +40,8 @@ public class DecksAdapter extends RecyclerView.Adapter<DecksAdapter.ViewHolder> 
     @Override
     public DecksAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        DeckItemView view = new DeckItemView(parent.getContext());
-        return new DecksAdapter.ViewHolder(view);
+        View deckItemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.deck_item, parent, false);
+        return new DecksAdapter.ViewHolder(deckItemView);
     }
 
     @Override

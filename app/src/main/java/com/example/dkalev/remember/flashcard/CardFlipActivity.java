@@ -1,5 +1,7 @@
 package com.example.dkalev.remember.flashcard;
 
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
@@ -10,8 +12,17 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.example.dkalev.remember.R;
+import com.example.dkalev.remember.deck.DecksActivity;
+import com.example.dkalev.remember.model.Card;
+import com.example.dkalev.remember.model.DeckViewModel;
+import com.example.dkalev.remember.model.Injection;
+import com.example.dkalev.remember.model.ViewModelFactory;
 
 import java.util.ArrayList;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class CardFlipActivity extends AppCompatActivity {
 
@@ -20,16 +31,38 @@ public class CardFlipActivity extends AppCompatActivity {
     private CardsAdapter mCardsAdapter;
     private RecyclerView mRecyclerView;
 
+    private DeckViewModel mViewModel;
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_flip);
 
         CardTestUtils ctu = new CardTestUtils(52353);
-        final ArrayList<Card> cards = ctu.getNewCards(10);
+//        final ArrayList<Card> cards = ctu.getNewCards(10);
+        final ArrayList<Card> cards = new ArrayList<>();
+
+        ViewModelFactory vmf = Injection.provideViewModelFactory(this);
+        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
+
+        String deckName = getIntent().getStringExtra(DecksActivity.DECK_NAME_EXTRA);
+        mDisposable.add(mViewModel.getDeckCards(deckName)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(d -> {
+            cards.addAll(d);
+            Card exampleCard = new Card();
+            exampleCard.setDeckId(deckName);
+            exampleCard.setTextFront("Front");
+            exampleCard.setTextBack("Back");
+            cards.add(exampleCard);
+            mCardsAdapter.notifyDataSetChanged();
+        },
+                throwable -> Log.e(DEBUG_TAG, "Unable to update username", throwable)));
+
         mCardsAdapter = new CardsAdapter(cards);
-
         mRecyclerView = findViewById(R.id.cardRecyclerView);
-
         mRecyclerView.setAdapter(mCardsAdapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
@@ -79,12 +112,11 @@ public class CardFlipActivity extends AppCompatActivity {
                 }
             }
         }));
+    }
 
-
-
-
-
-//
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mDisposable.clear();
     }
 }

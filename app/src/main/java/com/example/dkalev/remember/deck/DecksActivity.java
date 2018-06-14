@@ -42,6 +42,8 @@ public class DecksActivity extends AppCompatActivity {
 
     private final static String DEBUG_TAG = "DecksActivity";
 
+    public static final String DECK_NAME_EXTRA = "com.example.android.decksactivity.deckname";
+
     List<Deck> mDecks;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
@@ -70,14 +72,20 @@ public class DecksActivity extends AppCompatActivity {
 
         rv.addOnItemTouchListener(new DeckRecyclerTouchListener(this, rv, new DeckRecyclerTouchListener.ClickListener() {
             @Override
-            public void onClick(DeckItemView view) {
-                Log.d(DEBUG_TAG, "click");
-                Intent intent = new Intent(DecksActivity.this, CardFlipActivity.class);
-                startActivity(intent);
+            public void onClick(View view) {
+                //if you click not on item returns -1 and crashes
+                if (rv.getChildAdapterPosition(view) != RecyclerView.NO_POSITION) {
+                    Log.d(DEBUG_TAG, "click");
+                    Intent intent = new Intent(DecksActivity.this, CardFlipActivity.class);
+                    int pos = rv.getChildAdapterPosition(view);
+                    Deck deck = mDecks.get(pos);
+                    intent.putExtra(DECK_NAME_EXTRA, deck.getName());
+                    startActivity(intent);
+                }
             }
 
             @Override
-            public void onLongClick(DeckItemView view) {
+            public void onLongClick(View view) {
                 Log.d(DEBUG_TAG, "long click");
                 int pos = rv.getChildAdapterPosition(view);
                 Deck deck = mDecks.get(pos);
@@ -95,7 +103,7 @@ public class DecksActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFling(DeckItemView view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
             }
         }){
@@ -117,10 +125,12 @@ public class DecksActivity extends AppCompatActivity {
             mDisposable.add(mViewModel.addDeck(deck)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(d -> Toast.makeText(
+                    .subscribe(d -> {
+                        mDecksAdapter.notifyItemInserted(mDecksAdapter.getItemCount());
+                        Toast.makeText(
                             getApplicationContext(),
                             "Added new deck",
-                            Toast.LENGTH_LONG).show(),
+                            Toast.LENGTH_LONG).show();},
                             throwable -> Log.e(DEBUG_TAG, "Unable to add deck", throwable)));
         } else {
             Toast.makeText(

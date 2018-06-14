@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
 public class DeckRecyclerTouchListener implements RecyclerView.OnItemTouchListener {
     private GestureDetector mGestureDetector;
@@ -15,14 +16,14 @@ public class DeckRecyclerTouchListener implements RecyclerView.OnItemTouchListen
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                DeckItemView child = (DeckItemView)rv.findChildViewUnder(e.getX(), e.getY());
+                View child = rv.findChildViewUnder(e.getX(), e.getY());
                 mClickListener.onClick(child);
                 return true;
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
-                DeckItemView child = (DeckItemView) rv.findChildViewUnder(e.getX(), e.getY());
+                View child =  rv.findChildViewUnder(e.getX(), e.getY());
 
                 if (child != null && clickListener != null) {
                     clickListener.onLongClick(child);
@@ -31,7 +32,7 @@ public class DeckRecyclerTouchListener implements RecyclerView.OnItemTouchListen
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                    float velocityY){
-                DeckItemView child = (DeckItemView) rv.findChildViewUnder(e1.getX(), e1.getY());
+                View child = rv.findChildViewUnder(e1.getX(), e1.getY());
                 if (child != null && clickListener != null) {
                     clickListener.onFling(child, e1, e2, velocityX, velocityY);
                 }
@@ -56,11 +57,11 @@ public class DeckRecyclerTouchListener implements RecyclerView.OnItemTouchListen
     }
 
     public interface ClickListener {
-        void onClick(DeckItemView view);
+        void onClick(View view);
 
-        void onLongClick(DeckItemView view);
+        void onLongClick(View view);
 
-        void onFling(DeckItemView view, MotionEvent e1, MotionEvent e2, float velocityX,
+        void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX,
                      float velocityY);
     }
 }

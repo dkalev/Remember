@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dkalev.remember.R;
+import com.example.dkalev.remember.model.Card;
 
 import java.util.List;
 
@@ -53,9 +54,9 @@ public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> 
         Card card = mCards.get(position);
 
         TextView tv = holder.mTextFront;
-        tv.setText(card.getFrontText());
+        tv.setText(card.getTextFront());
         tv = holder.mTextBack;
-        tv.setText(card.getBackText());
+        tv.setText(card.getTextBack());
 
     }
 
