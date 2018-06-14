@@ -39,8 +39,6 @@ public class CardFlipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_flip);
 
-        CardTestUtils ctu = new CardTestUtils(52353);
-//        final ArrayList<Card> cards = ctu.getNewCards(10);
         final ArrayList<Card> cards = new ArrayList<>();
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);

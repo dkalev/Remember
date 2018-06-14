@@ -43,10 +43,8 @@ public class CardView extends ConstraintLayout {
         init(context);
     }
 
-
     private void init(Context context) {
         inflate(context, R.layout.fragment_card, this);
-
         flipped = false;
 
         mFront = findViewById(R.id.card_view_front);
@@ -68,7 +66,8 @@ public class CardView extends ConstraintLayout {
         //make the card fill the whole screen
         findViewById(R.id.card_layout).setLayoutParams(new Constraints.LayoutParams(dm.widthPixels, dm.heightPixels));
 
-        int cardSize = dm.widthPixels-dm.widthPixels/10;
+        int minSide = Math.min(dm.widthPixels, dm.heightPixels);
+        int cardSize = minSide - minSide/10;
         mFront.getLayoutParams().width = cardSize;
         mFront.getLayoutParams().height = cardSize;
         mBack.getLayoutParams().width = cardSize;

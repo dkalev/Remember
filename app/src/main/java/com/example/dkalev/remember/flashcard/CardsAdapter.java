@@ -1,7 +1,9 @@
 package com.example.dkalev.remember.flashcard;
 
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,6 +13,7 @@ import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.model.Card;
 
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> {
 
