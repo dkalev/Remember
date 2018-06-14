@@ -7,13 +7,13 @@ import android.view.MotionEvent;
 
 import com.example.dkalev.remember.flashcard.CardView;
 
-public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener  {
+public class CardRecyclerTouchListener implements RecyclerView.OnItemTouchListener  {
 
     private GestureDetector mGestureDetector;
     private ClickListener mClickListener;
 
 
-    public RecyclerTouchListener(Context context, final RecyclerView rv, final ClickListener clickListener){
+    public CardRecyclerTouchListener(Context context, final RecyclerView rv, final ClickListener clickListener){
         mClickListener = clickListener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
             @Override

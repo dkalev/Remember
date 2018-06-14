@@ -1,9 +1,4 @@
-package com.example.dkalev.remember;
-
-import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.Deck;
-import com.example.dkalev.remember.model.DeckDao;
-import com.example.dkalev.remember.model.DeckDataSource;
+package com.example.dkalev.remember.model;
 
 import java.util.List;
 
@@ -29,13 +24,19 @@ public class LocalDeckDataSource implements DeckDataSource {
     }
 
     @Override
-    public void insertOrUpdate(Deck deck) {
-        mDeckDao.insertAll(deck);
+    public Long[] insertOrUpdate(Deck... decks) {
+        return mDeckDao.insertAll(decks);
     }
 
     @Override
-    public void deleteDeck(Deck deck) {
-        mDeckDao.delete(deck);
+    public Long insertDeck(Deck deck) {
+        return mDeckDao.insertDeck(deck);
+    }
+
+    @Override
+    public int deleteDeck(Deck deck) {
+        mDeckDao.deleteCards(deck.getName());
+        return mDeckDao.delete(deck);
     }
 
     @Override

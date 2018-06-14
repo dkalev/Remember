@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 
 import com.example.dkalev.remember.R;
+import com.example.dkalev.remember.model.Deck;
 
 import java.util.List;
 
@@ -28,9 +29,9 @@ public class DecksAdapter extends RecyclerView.Adapter<DecksAdapter.ViewHolder> 
         }
     }
 
-    private List<Deck> mDecks;
+    private List<com.example.dkalev.remember.model.Deck> mDecks;
 
-    public DecksAdapter(List<Deck> decks){
+    public DecksAdapter(List<com.example.dkalev.remember.model.Deck> decks){
         mDecks = decks;
     }
 
@@ -47,9 +48,9 @@ public class DecksAdapter extends RecyclerView.Adapter<DecksAdapter.ViewHolder> 
         Deck deck = mDecks.get(position);
 
         TextView tv = holder.mDeckName;
-        tv.setText(deck.getDeckName());
+        tv.setText(deck.getName());
         tv = holder.mNumCards;
-        tv.setText(String.valueOf(deck.getNumCards()));
+        tv.setText(String.valueOf(deck.getSize()));
     }
 
     @Override

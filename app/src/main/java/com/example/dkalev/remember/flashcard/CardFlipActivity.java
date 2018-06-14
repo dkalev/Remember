@@ -41,7 +41,7 @@ public class CardFlipActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(llm);
 
-        mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), mRecyclerView, new RecyclerTouchListener.ClickListener() {
+        mRecyclerView.addOnItemTouchListener(new CardRecyclerTouchListener(this, mRecyclerView, new CardRecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(CardView view) {
                 Log.d(DEBUG_TAG, "click");

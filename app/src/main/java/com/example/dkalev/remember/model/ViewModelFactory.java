@@ -1,4 +1,22 @@
 package com.example.dkalev.remember.model;
 
-public class ViewModelFactory {
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
+import android.support.annotation.NonNull;
+
+public class ViewModelFactory implements ViewModelProvider.Factory {
+
+    private DeckDataSource mDataSource;
+
+    public ViewModelFactory(DeckDataSource dataSource) {
+        mDataSource = dataSource;
+    }
+    @NonNull
+    @Override
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if ( modelClass.isAssignableFrom(DeckViewModel.class))
+            return (T) new DeckViewModel(mDataSource);
+
+        throw new IllegalArgumentException("Unknown ViewModel class");
+    }
 }
