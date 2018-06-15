@@ -101,6 +101,14 @@ public class CardView extends ConstraintLayout {
         flipped = false;
     }
 
+    public int getSide(){
+        if(mFront.getVisibility() == View.VISIBLE){
+            return 0;
+        }else{
+            return 1;
+        }
+    }
+
     private void initFlipAnimation(Context context){
 
         mLeft_in = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.left_in_animation);

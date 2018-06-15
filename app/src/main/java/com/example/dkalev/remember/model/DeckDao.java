@@ -24,6 +24,9 @@ public interface DeckDao {
     @Query("DELETE FROM card WHERE :cardId == uid")
     void deleteCard(int cardId);
 
+    @Query("SELECT * FROM card WHERE :card_uid == uid")
+    Flowable<Card> getCard(int card_uid);
+
     @Insert
     Long[] insertAll(Deck... decks);
 

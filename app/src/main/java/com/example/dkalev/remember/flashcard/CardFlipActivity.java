@@ -1,15 +1,20 @@
 package com.example.dkalev.remember.flashcard;
 
+import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Fade;
 import android.util.Log;
+import android.util.Pair;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.deck.DecksActivity;
@@ -27,6 +32,8 @@ import io.reactivex.schedulers.Schedulers;
 public class CardFlipActivity extends AppCompatActivity {
 
     private static final String DEBUG_TAG = "CardFlipActivity";
+    public static final String EXTRA_CARD_UID = "EXTRA_CARD_UID";
+    public static final String EXTRA_CARD_SIDE = "EXTRA_CARD_UID";
 
     private CardsAdapter mCardsAdapter;
     private RecyclerView mRecyclerView;
@@ -35,30 +42,47 @@ public class CardFlipActivity extends AppCompatActivity {
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
+    private ArrayList<Card> mCards;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_flip);
-
-        final ArrayList<Card> cards = new ArrayList<>();
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
 
         String deckName = getIntent().getStringExtra(DecksActivity.DECK_NAME_EXTRA);
-        mDisposable.add(mViewModel.getDeckCards(deckName)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(d -> {
-            cards.addAll(d);
-            Card exampleCard = new Card();
-            exampleCard.setDeckId(deckName);
-            exampleCard.setTextFront("Front");
-            exampleCard.setTextBack("Back");
-            cards.add(exampleCard);
-            mCardsAdapter.notifyDataSetChanged();
-        },
-                throwable -> Log.e(DEBUG_TAG, "Unable to update username", throwable)));
 
+        mCards = fetchDeckCards(deckName);
+
+        setupRecyclerView(mCards);
+    }
+
+    private ArrayList<Card> fetchDeckCards(String deckName){
+        ArrayList<Card> cards = new ArrayList<>();
+        mDisposable.add(mViewModel.getDeckCards(deckName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(d -> {
+                            cards.addAll(d);
+
+                            //just temporary add card to check if working
+                            for(int i = 0; i < 10; i++) {
+                                Card exampleCard = new Card();
+                                exampleCard.setDeckId(deckName);
+                                exampleCard.setTextFront("Front " + i);
+                                exampleCard.setTextBack("Back " + i);
+                                cards.add(exampleCard);
+                            }
+
+
+                            mCardsAdapter.notifyDataSetChanged();
+                        },
+                        throwable -> Log.e(DEBUG_TAG, "Unable to update username", throwable)));
+        return cards;
+    }
+
+    private void setupRecyclerView(ArrayList<Card> cards){
         mCardsAdapter = new CardsAdapter(cards);
         mRecyclerView = findViewById(R.id.cardRecyclerView);
         mRecyclerView.setAdapter(mCardsAdapter);
@@ -72,6 +96,8 @@ public class CardFlipActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(llm);
 
+        mRecyclerView.setItemAnimator(new CardItemAnimator());
+
         mRecyclerView.addOnItemTouchListener(new CardRecyclerTouchListener(this, mRecyclerView, new CardRecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(CardView view) {
@@ -82,6 +108,12 @@ public class CardFlipActivity extends AppCompatActivity {
             @Override
             public void onLongClick(CardView view) {
                 Log.d(DEBUG_TAG, "longclick");
+                int pos = mRecyclerView.getChildAdapterPosition(view);
+                if (pos != -1) {
+                    Card card = mCards.get(pos);
+                    int side = view.getSide();
+                    startEditCardActivity(view, card.getUid(), side);
+                }
             }
 
             @Override
@@ -97,20 +129,49 @@ public class CardFlipActivity extends AppCompatActivity {
 
                     flingX.start();
                     flingY.start();
-                    flingX.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
-                        @Override
-                        public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
-                            cards.remove(0);
-                            mRecyclerView.getAdapter().notifyItemRemoved(0);
-                        }
+                    flingX.addEndListener((animation, canceled, value, velocity) -> {
+                        cards.remove(0);
+                        mRecyclerView.getAdapter().notifyItemRemoved(0);
                     });
-//                    cards.remove(0);
-//                    mRecyclerView.getAdapter().notifyItemRemoved(0);
                     //todo open next activity when out of cards
                 }
             }
         }));
     }
+
+    private void startEditCardActivity(CardView view, int cardUid, int side){
+        Intent intent = new Intent(this, EditCardActivity.class);
+        intent.putExtra(EXTRA_CARD_UID, cardUid);
+        intent.putExtra(EXTRA_CARD_SIDE, side);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setEnterTransition(new Fade(Fade.IN));
+            getWindow().setEnterTransition(new Fade(Fade.OUT));
+
+            Pair<View, String> cardPair;
+            Pair<View, String> textPair;
+            if (view.getSide() == 0){
+                cardPair = new Pair<>(view.findViewById(R.id.card_view_front),
+                        getString(R.string.front_card_transition));
+                textPair = new Pair<>(view.findViewById(R.id.cardFrontTextView),
+                        getString(R.string.frontET_transition));
+            }else{
+                cardPair = new Pair<>(view.findViewById(R.id.card_view_back),
+                        getString(R.string.back_card_transition));
+                textPair = new Pair<>(view.findViewById(R.id.cardBackTextView),
+                        getString(R.string.backET_transition));
+            }
+
+            ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(this,cardPair, textPair);
+
+            startActivity(intent, options.toBundle());
+
+        } else {
+            startActivity(intent);
+        }
+    }
+
 
     @Override
     protected void onStop() {

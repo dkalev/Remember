@@ -29,7 +29,10 @@
             android:name=".deck.DecksActivity"
             android:label="@string/title_activity_decks"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".deck.CreateDeckActivity"></activity>
+        <activity android:name=".deck.CreateDeckActivity"/>
+        <activity android:name=".flashcard.EditCardActivity"
+            android:theme="@style/NoActionBar"/>
+
     </application>
 
 </manifest>

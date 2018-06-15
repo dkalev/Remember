@@ -50,5 +50,10 @@ public class LocalDeckDataSource implements DeckDataSource {
         mDeckDao.deleteCard(card.getUid());
     }
 
+    @Override
+    public Flowable<Card> getCard(int card_uid) {
+        return mDeckDao.getCard(card_uid);
+    }
+
 
 }

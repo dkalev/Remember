@@ -11,10 +11,11 @@
     <TextView
         android:id="@+id/deckNameTextView"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="25dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/deck_name"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/numCardsTextView"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,8 +26,8 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
+        android:text="@string/deck_size"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/deckNameTextView"
+        app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

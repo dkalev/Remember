@@ -44,7 +44,7 @@ public class DecksActivity extends AppCompatActivity {
 
     public static final String DECK_NAME_EXTRA = "com.example.android.decksactivity.deckname";
 
-    List<Deck> mDecks;
+    private List<Deck> mDecks;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -54,21 +54,33 @@ public class DecksActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_decks);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        RecyclerView rv = findViewById(R.id.decksRecyclerView);
-
-        rv.setLayoutManager(new LinearLayoutManager(this));
-
-        mDecks = new ArrayList<>();
-
-        mDecksAdapter = new DecksAdapter(mDecks);
-        rv.setAdapter(mDecksAdapter);
+        setupRecyclerView();
 
         //inject the viewModel / db dependencies
         mViewModelFactory = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModel.class);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+           Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
+           startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
+        });
+    }
+
+
+    private void setupRecyclerView(){
+        mDecks = new ArrayList<>();
+
+        mDecksAdapter = new DecksAdapter(mDecks);
+
+        RecyclerView rv = findViewById(R.id.decksRecyclerView);
+
+        rv.setAdapter(mDecksAdapter);
+
+        rv.setLayoutManager(new LinearLayoutManager(this));
 
         rv.addOnItemTouchListener(new DeckRecyclerTouchListener(this, rv, new DeckRecyclerTouchListener.ClickListener() {
             @Override
@@ -90,33 +102,24 @@ public class DecksActivity extends AppCompatActivity {
                 int pos = rv.getChildAdapterPosition(view);
                 Deck deck = mDecks.get(pos);
                 mDisposable.add(mViewModel.deleteDeck(deck)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(d -> {
-                    mDecks.remove(deck);
-                    mDecksAdapter.notifyItemRemoved(pos);
-                    Toast.makeText(
-                        getApplicationContext(),
-                        "Deck deleted",
-                        Toast.LENGTH_LONG).show();},
-                        throwable -> Log.e(DEBUG_TAG, "Unable to delete deck", throwable)));
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(d -> {
+                                    mDecks.remove(deck);
+                                    mDecksAdapter.notifyItemRemoved(pos);
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "Deck deleted",
+                                            Toast.LENGTH_LONG).show();},
+                                throwable -> Log.e(DEBUG_TAG, "Unable to delete deck", throwable)));
             }
 
             @Override
             public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
             }
-        }){
-
-        });
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-           Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
-           startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
-        });
+        }));
     }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 

@@ -32,6 +32,9 @@ public class DeckViewModel extends ViewModel {
         mDataSource.insertCard(deck, card);
     }
 
+    public Flowable<Card> getCard(int card_uid){
+        return mDataSource.getCard(card_uid);
+    }
     public void deleteCard(Card card){
         mDataSource.deleteCard(card);
     }
