@@ -2,9 +2,12 @@ package com.example.dkalev.remember.model;
 
 import android.arch.lifecycle.ViewModel;
 
+import org.intellij.lang.annotations.Flow;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.internal.operators.completable.CompletableToFlowable;
@@ -28,8 +31,11 @@ public class DeckViewModel extends ViewModel {
         return mDataSource.getDeck(deckName);
     }
 
-    public void addCard(Deck deck, Card card){
-        mDataSource.insertCard(deck, card);
+    public Completable addCard(Deck deck, Card card){
+        return Completable.fromCallable(() -> {
+            mDataSource.insertCard(deck, card);
+            return "Done";
+        });
     }
 
     public Flowable<Card> getCard(int card_uid){
@@ -49,6 +55,15 @@ public class DeckViewModel extends ViewModel {
 
     public Single<Integer> deleteDeck(Deck deck) {
         return Single.fromCallable(() -> mDataSource.deleteDeck(deck));
+    }
+
+    public Completable updateCard(Card card){
+        return Completable.fromCallable(() -> {
+            if (mDataSource.updateCard(card) > 0) {
+                return "Done";
+            }
+            return "Error";
+        });
     }
 
 }

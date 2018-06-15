@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -26,6 +27,9 @@ public interface DeckDao {
 
     @Query("SELECT * FROM card WHERE :card_uid == uid")
     Flowable<Card> getCard(int card_uid);
+
+    @Update
+    int updateCard(Card card);
 
     @Insert
     Long[] insertAll(Deck... decks);

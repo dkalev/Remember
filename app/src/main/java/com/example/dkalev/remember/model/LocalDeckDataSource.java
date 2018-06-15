@@ -51,6 +51,11 @@ public class LocalDeckDataSource implements DeckDataSource {
     }
 
     @Override
+    public int updateCard(Card card) {
+        return mDeckDao.updateCard(card);
+    }
+
+    @Override
     public Flowable<Card> getCard(int card_uid) {
         return mDeckDao.getCard(card_uid);
     }

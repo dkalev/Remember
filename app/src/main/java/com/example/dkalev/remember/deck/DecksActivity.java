@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.flashcard.CardFlipActivity;
+import com.example.dkalev.remember.model.Card;
 import com.example.dkalev.remember.model.Deck;
 import com.example.dkalev.remember.model.DeckViewModel;
 import com.example.dkalev.remember.model.Injection;
@@ -117,6 +118,17 @@ public class DecksActivity extends AppCompatActivity {
             @Override
             public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
+                Card card = new Card();
+                card.setTextFront("Front");
+                card.setTextBack("Back");
+                Deck deck = mDecks.get(rv.getChildAdapterPosition(view));
+                card.setDeckId(deck.getName());
+                mDisposable.add(mViewModel.addCard(deck, card)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() ->
+                            Log.d(DEBUG_TAG, "Card added")
+                    ,throwable -> Log.e(DEBUG_TAG, "Unable to add deck", throwable)));
             }
         }));
     }

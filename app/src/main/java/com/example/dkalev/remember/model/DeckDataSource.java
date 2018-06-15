@@ -20,5 +20,7 @@ public interface DeckDataSource {
 
     void deleteCard(Card card);
 
+    int updateCard(Card card);
+
     Flowable<Card> getCard(int card_uid);
 }

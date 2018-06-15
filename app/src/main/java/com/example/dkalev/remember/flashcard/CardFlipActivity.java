@@ -58,6 +58,7 @@ public class CardFlipActivity extends AppCompatActivity {
         setupRecyclerView(mCards);
     }
 
+
     private ArrayList<Card> fetchDeckCards(String deckName){
         ArrayList<Card> cards = new ArrayList<>();
         mDisposable.add(mViewModel.getDeckCards(deckName)
@@ -65,15 +66,14 @@ public class CardFlipActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(d -> {
                             cards.addAll(d);
-
                             //just temporary add card to check if working
-                            for(int i = 0; i < 10; i++) {
-                                Card exampleCard = new Card();
-                                exampleCard.setDeckId(deckName);
-                                exampleCard.setTextFront("Front " + i);
-                                exampleCard.setTextBack("Back " + i);
-                                cards.add(exampleCard);
-                            }
+//                            for(int i = 0; i < 10; i++) {
+////                                Card exampleCard = new Card();
+////                                exampleCard.setDeckId(deckName);
+////                                exampleCard.setTextFront("Front " + i);
+////                                exampleCard.setTextBack("Back " + i);
+////                                cards.add(exampleCard);
+////                            }
 
 
                             mCardsAdapter.notifyDataSetChanged();
@@ -138,6 +138,7 @@ public class CardFlipActivity extends AppCompatActivity {
             }
         }));
     }
+
 
     private void startEditCardActivity(CardView view, int cardUid, int side){
         Intent intent = new Intent(this, EditCardActivity.class);
