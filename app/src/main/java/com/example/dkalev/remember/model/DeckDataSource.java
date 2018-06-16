@@ -8,19 +8,21 @@ public interface DeckDataSource {
 
     Flowable<List<Deck>> getAllDecks();
 
-    Flowable<List<Card>> getDeck(String name);
+    Flowable<List<Card>> getDeckCards(int deckId);
 
-    Long[] insertOrUpdate(Deck... decks);
+    Flowable<Deck> getDeck(int deckId);
 
-    Long insertDeck(Deck deck);
+    void insertOrUpdateDeck(Deck... decks);
 
-    int deleteDeck(Deck deck);
+    void deleteDeckCards(int deckId);
 
-    void insertCard(Deck deck, Card card);
+    void deleteDeck(Deck deck);
+
+    Flowable<Card> getCard(int carId);
+
+    void insertCard(Card card);
+
+    void updateCard(Card card);
 
     void deleteCard(Card card);
-
-    int updateCard(Card card);
-
-    Flowable<Card> getCard(int card_uid);
 }

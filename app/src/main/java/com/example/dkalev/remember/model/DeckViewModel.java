@@ -23,17 +23,32 @@ public class DeckViewModel extends ViewModel {
     }
 
     public Flowable<List<Deck>> getAllDecks() {
-        mDecks = mDataSource.getAllDecks();
-        return mDecks;
+        return mDataSource.getAllDecks();
     }
 
-    public Flowable<List<Card>> getDeckCards(String deckName){
-        return mDataSource.getDeck(deckName);
+    public Flowable<Deck> getDeck(int deckId){
+        return mDataSource.getDeck(deckId);
+//        return Flowable.zip(mDataSource.getDeck(deckId),mDataSource.getDeckCards(deckId),(deck, cards) -> {
+//            deck.setCards(cards);
+//            return Flowable.just(deck);
+//        });
     }
 
-    public Completable addCard(Deck deck, Card card){
+    public Flowable<List<Card>> getDeckCards(int deckId){
+        return mDataSource.getDeckCards(deckId);
+    }
+
+
+    public Completable addDecks(Deck... decks){
         return Completable.fromCallable(() -> {
-            mDataSource.insertCard(deck, card);
+            mDataSource.insertOrUpdateDeck(decks);
+            return "Done";
+        });
+    }
+
+    public Completable deleteDeck(Deck deck) {
+        return Completable.fromCallable(() -> {
+            mDataSource.deleteDeck(deck);
             return "Done";
         });
     }
@@ -41,28 +56,25 @@ public class DeckViewModel extends ViewModel {
     public Flowable<Card> getCard(int card_uid){
         return mDataSource.getCard(card_uid);
     }
-    public void deleteCard(Card card){
-        mDataSource.deleteCard(card);
-    }
 
-    public Single<Long[]> addDecks(Deck... decks){
-        return Single.fromCallable(() -> mDataSource.insertOrUpdate(decks));
-    }
-
-    public Single<Long> addDeck(Deck deck){
-        return Single.fromCallable(() -> mDataSource.insertDeck(deck));
-    }
-
-    public Single<Integer> deleteDeck(Deck deck) {
-        return Single.fromCallable(() -> mDataSource.deleteDeck(deck));
+    public Completable addCard(Card card){
+        return Completable.fromCallable(() -> {
+            mDataSource.insertCard(card);
+            return "Done";
+        });
     }
 
     public Completable updateCard(Card card){
         return Completable.fromCallable(() -> {
-            if (mDataSource.updateCard(card) > 0) {
-                return "Done";
-            }
-            return "Error";
+            mDataSource.updateCard(card);
+            return "Done";
+        });
+    }
+
+    public Completable deleteCard(Card card){
+        return Completable.fromCallable(() -> {
+            mDataSource.deleteCard(card);
+            return "Done";
         });
     }
 

@@ -43,7 +43,7 @@ public class DecksActivity extends AppCompatActivity {
 
     private final static String DEBUG_TAG = "DecksActivity";
 
-    public static final String DECK_NAME_EXTRA = "com.example.android.decksactivity.deckname";
+    public static final String DECK_ID_EXTRA = "com.example.android.decksactivity.deckid";
 
     private List<Deck> mDecks;
 
@@ -92,7 +92,7 @@ public class DecksActivity extends AppCompatActivity {
                     Intent intent = new Intent(DecksActivity.this, CardFlipActivity.class);
                     int pos = rv.getChildAdapterPosition(view);
                     Deck deck = mDecks.get(pos);
-                    intent.putExtra(DECK_NAME_EXTRA, deck.getName());
+                    intent.putExtra(DECK_ID_EXTRA, deck.getDeckId());
                     startActivity(intent);
                 }
             }
@@ -105,7 +105,7 @@ public class DecksActivity extends AppCompatActivity {
                 mDisposable.add(mViewModel.deleteDeck(deck)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(d -> {
+                        .subscribe(() -> {
                                     mDecks.remove(deck);
                                     mDecksAdapter.notifyItemRemoved(pos);
                                     Toast.makeText(
@@ -118,12 +118,11 @@ public class DecksActivity extends AppCompatActivity {
             @Override
             public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
-                Card card = new Card();
+                Deck deck = mDecks.get(rv.getChildAdapterPosition(view));
+                Card card = new Card(deck.getDeckId());
                 card.setTextFront("Front");
                 card.setTextBack("Back");
-                Deck deck = mDecks.get(rv.getChildAdapterPosition(view));
-                card.setDeckId(deck.getName());
-                mDisposable.add(mViewModel.addCard(deck, card)
+                mDisposable.add(mViewModel.addCard(card)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(() ->
@@ -136,11 +135,11 @@ public class DecksActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CREATE_DECK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            com.example.dkalev.remember.model.Deck deck = new com.example.dkalev.remember.model.Deck(data.getStringExtra(CreateDeckActivity.EXTRA_REPLY));
-            mDisposable.add(mViewModel.addDeck(deck)
+            Deck deck = new Deck(data.getStringExtra(CreateDeckActivity.EXTRA_REPLY));
+            mDisposable.add(mViewModel.addDecks(deck)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(d -> {
+                    .subscribe(() -> {
                         mDecksAdapter.notifyItemInserted(mDecksAdapter.getItemCount());
                         Toast.makeText(
                             getApplicationContext(),
@@ -169,7 +168,7 @@ public class DecksActivity extends AppCompatActivity {
                     mDecks.clear();
                     mDecks.addAll(decks);
                     mDecksAdapter.notifyDataSetChanged();},
-                        throwable -> Log.e(DEBUG_TAG, "Unable to update username", throwable)));
+                        throwable -> Log.e(DEBUG_TAG, "Unable to get decks", throwable)));
     }
 
     @Override

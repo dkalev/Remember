@@ -12,12 +12,16 @@ public abstract class DecksDatabase extends RoomDatabase{
 
     public abstract DeckDao deckDao();
 
+    public abstract CardDao cardDao();
+
     public static DecksDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (DecksDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             DecksDatabase.class, "Decks.db")
+                            //TODO remove when finished with schema
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

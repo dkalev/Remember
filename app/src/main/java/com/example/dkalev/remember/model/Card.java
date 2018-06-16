@@ -11,7 +11,7 @@ import java.sql.Blob;
 
 @Entity(foreignKeys = @ForeignKey(
         entity = Deck.class,
-        parentColumns = "name",
+        parentColumns = "deck_id",
         childColumns = "deck_id"))
 public class Card {
 
@@ -24,17 +24,13 @@ public class Card {
     @ColumnInfo(name = "text_back")
     private String textBack;
 
-    public void setUid(int uid) {
-        this.uid = uid;
+    @ColumnInfo(name = "deck_id")
+    private int deckId;
+
+    public Card(int deckId){
+        this.deckId = deckId;
     }
 
-    public void setTextFront(String textFront) {
-        this.textFront = textFront;
-    }
-
-    public void setTextBack(String textBack) {
-        this.textBack = textBack;
-    }
 
 //    public void setImageFront(Bitmap imageFront) {
 //        this.imageFront = imageFront;
@@ -51,12 +47,8 @@ public class Card {
 //    @ColumnInfo(name = "image_back")
 //    private Bitmap imageBack;
 
-
-    @ColumnInfo(name = "deck_id")
-    private String deckId;
-
-    public void setDeckId(String deckId) {
-        this.deckId = deckId;
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 
     public int getUid() {
@@ -71,7 +63,19 @@ public class Card {
         return textBack;
     }
 
-    public String getDeckId() {
+    public void setTextFront(String textFront) {
+        this.textFront = textFront;
+    }
+
+    public void setTextBack(String textBack) {
+        this.textBack = textBack;
+    }
+
+    public int getDeckId() {
         return deckId;
+    }
+
+    public void setDeckId(int deckId) {
+        this.deckId = deckId;
     }
 }

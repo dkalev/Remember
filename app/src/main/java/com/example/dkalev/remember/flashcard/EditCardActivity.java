@@ -71,7 +71,6 @@ public class EditCardActivity extends AppCompatActivity {
 
         }
 
-        mCard = new Card();
         getCard(card_uid);
 
         //show hide keyboards
@@ -127,13 +126,14 @@ public class EditCardActivity extends AppCompatActivity {
     }
 
     private void getCard(int card_uid){
+        Log.d(DEBUG_TAG, "card uid: "+card_uid);
         mDisposable.add(mViewModel.getCard(card_uid)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(card -> {
                     //initially tried to assign the card to mCard: mCard = card
                     //very stupid, because probably after finishing the anonimous function the card is destroyed
-                    mCard.setDeckId(card.getDeckId());
+                    mCard = new Card(card.getDeckId());
                     mCard.setTextFront(card.getTextFront());
                     mCard.setTextBack(card.getTextBack());
                     mCard.setUid(card.getUid());

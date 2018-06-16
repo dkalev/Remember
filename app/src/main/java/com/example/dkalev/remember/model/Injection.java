@@ -6,7 +6,7 @@ public class Injection {
 
     public static DeckDataSource provideUserDataSource(Context context) {
         DecksDatabase database = DecksDatabase.getInstance(context);
-        return new LocalDeckDataSource(database.deckDao());
+        return new LocalDeckDataSource(database.deckDao(), database.cardDao());
     }
 
     public static ViewModelFactory provideViewModelFactory(Context context) {

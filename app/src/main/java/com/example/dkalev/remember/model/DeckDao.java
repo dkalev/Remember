@@ -16,31 +16,19 @@ public interface DeckDao {
     @Query("SELECT * FROM deck")
     Flowable<List<Deck>> getAll();
 
-    @Query("SELECT * FROM card WHERE :name == deck_id")
-    Flowable<List<Card>> getCards(String name);
+    @Query("SELECT * FROM deck WHERE :deckId == deck_id")
+    Flowable<Deck> getDeck(int deckId);
 
     @Insert
-    void insertCard(Card card);
-
-    @Query("DELETE FROM card WHERE :cardId == uid")
-    void deleteCard(int cardId);
-
-    @Query("SELECT * FROM card WHERE :card_uid == uid")
-    Flowable<Card> getCard(int card_uid);
-
-    @Update
-    int updateCard(Card card);
-
-    @Insert
-    Long[] insertAll(Deck... decks);
-
-    @Insert
-    Long insertDeck(Deck deck);
-
-    @Query("DELETE FROM card WHERE :deckId == deck_id")
-    void deleteCards(String deckId);
+    void insertAll(Deck... decks);
 
     @Delete
-    int delete(Deck deck);
+    void delete(Deck deck);
+
+    @Query("SELECT * FROM card WHERE :deckId == deck_id")
+    Flowable<List<Card>> getCards(int deckId);
+
+    @Query("DELETE FROM card WHERE :deckId == deck_id")
+    void deleteCards(int deckId);
 
 }

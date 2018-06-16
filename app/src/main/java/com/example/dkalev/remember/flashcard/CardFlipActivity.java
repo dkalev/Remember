@@ -51,17 +51,17 @@ public class CardFlipActivity extends AppCompatActivity {
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
 
-        String deckName = getIntent().getStringExtra(DecksActivity.DECK_NAME_EXTRA);
+        int deckId = getIntent().getIntExtra(DecksActivity.DECK_ID_EXTRA, 0);
 
-        mCards = fetchDeckCards(deckName);
+        mCards = fetchDeckCards(deckId);
 
         setupRecyclerView(mCards);
     }
 
 
-    private ArrayList<Card> fetchDeckCards(String deckName){
+    private ArrayList<Card> fetchDeckCards(int deckId){
         ArrayList<Card> cards = new ArrayList<>();
-        mDisposable.add(mViewModel.getDeckCards(deckName)
+        mDisposable.add(mViewModel.getDeckCards(deckId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(d -> {
@@ -112,6 +112,7 @@ public class CardFlipActivity extends AppCompatActivity {
                 if (pos != -1) {
                     Card card = mCards.get(pos);
                     int side = view.getSide();
+                    Log.d(DEBUG_TAG, "card uid:" + card.getUid());
                     startEditCardActivity(view, card.getUid(), side);
                 }
             }

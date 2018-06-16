@@ -8,8 +8,11 @@ public class LocalDeckDataSource implements DeckDataSource {
 
     private final DeckDao mDeckDao;
 
-    public LocalDeckDataSource(DeckDao deckDao){
+    private final CardDao mCardDao;
+
+    public LocalDeckDataSource(DeckDao deckDao, CardDao cardDao){
         mDeckDao = deckDao;
+        mCardDao = cardDao;
     }
 
 
@@ -19,46 +22,53 @@ public class LocalDeckDataSource implements DeckDataSource {
     }
 
     @Override
-    public Flowable<List<Card>> getDeck(String name) {
-        return mDeckDao.getCards(name);
+    public Flowable<Deck> getDeck(int deckId) {
+        return mDeckDao.getDeck(deckId);
     }
 
     @Override
-    public Long[] insertOrUpdate(Deck... decks) {
-        return mDeckDao.insertAll(decks);
+    public Flowable<List<Card>> getDeckCards(int deckId) {
+        return mDeckDao.getCards(deckId);
     }
 
     @Override
-    public Long insertDeck(Deck deck) {
-        return mDeckDao.insertDeck(deck);
+    public void insertOrUpdateDeck(Deck... decks) {
+        mDeckDao.insertAll(decks);
+    }
+
+
+    @Override
+    public void deleteDeck(Deck deck) {
+        mDeckDao.delete(deck);
     }
 
     @Override
-    public int deleteDeck(Deck deck) {
-        mDeckDao.deleteCards(deck.getName());
-        return mDeckDao.delete(deck);
-    }
-
-    @Override
-    public void insertCard(Deck deck, Card card) {
-        card.setDeckId(deck.getName());
-        mDeckDao.insertCard(card);
-    }
-
-    @Override
-    public void deleteCard(Card card) {
-        mDeckDao.deleteCard(card.getUid());
-    }
-
-    @Override
-    public int updateCard(Card card) {
-        return mDeckDao.updateCard(card);
+    public void deleteDeckCards(int deckId) {
+        mDeckDao.deleteCards(deckId);
     }
 
     @Override
     public Flowable<Card> getCard(int card_uid) {
-        return mDeckDao.getCard(card_uid);
+        return mCardDao.getCard(card_uid);
     }
+
+    @Override
+    public void insertCard(Card card) {
+        mCardDao.insertAll(card);
+    }
+
+    @Override
+    public void updateCard(Card card) {
+        mCardDao.updateCard(card);
+    }
+
+    @Override
+    public void deleteCard(Card card) {
+        mCardDao.deleteCard(card.getUid());
+    }
+
+
+
 
 
 }
