@@ -17,7 +17,7 @@ import android.view.WindowManager;
 
 import com.example.dkalev.remember.R;
 
-public class CardView extends ConstraintLayout {
+public class FlashcardView extends ConstraintLayout {
     private android.support.v7.widget.CardView mFront;
     private android.support.v7.widget.CardView mBack;
     private AnimatorSet mLeft_in;
@@ -28,17 +28,17 @@ public class CardView extends ConstraintLayout {
     private ConstraintLayout mLayout;
     private boolean flipped;
 
-    public CardView(@NonNull Context context) {
+    public FlashcardView(@NonNull Context context) {
         super(context);
         init(context);
     }
 
-    public CardView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public FlashcardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public CardView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public FlashcardView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

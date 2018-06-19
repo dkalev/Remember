@@ -17,6 +17,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         if ( modelClass.isAssignableFrom(DeckViewModel.class))
             return (T) new DeckViewModel(mDataSource);
 
+        if ( modelClass.isAssignableFrom(CardViewModel.class))
+            return (T) new CardViewModel(mDataSource);
+
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
 }

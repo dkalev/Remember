@@ -16,28 +16,29 @@ public class DeckViewModel extends ViewModel {
 
     private final DeckDataSource mDataSource;
 
-    private Flowable<List<Deck>> mDecks;
+    private Flowable<List<Deck>> decks;
 
     public DeckViewModel(DeckDataSource dataSource){
         mDataSource = dataSource;
     }
 
     public Flowable<List<Deck>> getAllDecks() {
-        return mDataSource.getAllDecks();
+        if(decks == null)
+            decks = mDataSource.getAllDecks();
+        return decks;
     }
 
     public Flowable<Deck> getDeck(int deckId){
-        return mDataSource.getDeck(deckId);
-//        return Flowable.zip(mDataSource.getDeck(deckId),mDataSource.getDeckCards(deckId),(deck, cards) -> {
-//            deck.setCards(cards);
-//            return Flowable.just(deck);
-//        });
+        if(decks == null)
+            getAllDecks();
+        return Flowable.zip(decks.flatMapIterable(list -> list)
+                        .filter(d -> d.getDeckId() == deckId)
+                ,mDataSource.getDeckCards(deckId),
+                (deck, cards) -> {
+            deck.setCards(cards);
+            return deck;
+        });
     }
-
-    public Flowable<List<Card>> getDeckCards(int deckId){
-        return mDataSource.getDeckCards(deckId);
-    }
-
 
     public Completable addDecks(Deck... decks){
         return Completable.fromCallable(() -> {
@@ -53,29 +54,11 @@ public class DeckViewModel extends ViewModel {
         });
     }
 
-    public Flowable<Card> getCard(int card_uid){
-        return mDataSource.getCard(card_uid);
-    }
-
+    //todo remove later
     public Completable addCard(Card card){
         return Completable.fromCallable(() -> {
             mDataSource.insertCard(card);
             return "Done";
         });
     }
-
-    public Completable updateCard(Card card){
-        return Completable.fromCallable(() -> {
-            mDataSource.updateCard(card);
-            return "Done";
-        });
-    }
-
-    public Completable deleteCard(Card card){
-        return Completable.fromCallable(() -> {
-            mDataSource.deleteCard(card);
-            return "Done";
-        });
-    }
-
 }

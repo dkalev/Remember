@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,6 +42,7 @@ public class CardFlipActivity extends AppCompatActivity {
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     private ArrayList<Card> mCards;
+    private int mDeckId;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,34 +51,31 @@ public class CardFlipActivity extends AppCompatActivity {
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
 
-        int deckId = getIntent().getIntExtra(DecksActivity.DECK_ID_EXTRA, 0);
+        mDeckId = getIntent().getIntExtra(DecksActivity.DECK_ID_EXTRA, 0);
 
-        mCards = fetchDeckCards(deckId);
+        mCards = fetchDeckCards(mDeckId);
 
         setupRecyclerView(mCards);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        fetchDeckCards(mDeckId);
+    }
 
     private ArrayList<Card> fetchDeckCards(int deckId){
         ArrayList<Card> cards = new ArrayList<>();
-        mDisposable.add(mViewModel.getDeckCards(deckId)
+        mDisposable.add(mViewModel.getDeck(deckId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(d -> {
-                            cards.addAll(d);
-                            //just temporary add card to check if working
-//                            for(int i = 0; i < 10; i++) {
-////                                Card exampleCard = new Card();
-////                                exampleCard.setDeckId(deckName);
-////                                exampleCard.setTextFront("Front " + i);
-////                                exampleCard.setTextBack("Back " + i);
-////                                cards.add(exampleCard);
-////                            }
-
-
+                            cards.addAll(d.getCards());
+                            mCards.clear();
+                            mCards.addAll(d.getCards());
                             mCardsAdapter.notifyDataSetChanged();
                         },
-                        throwable -> Log.e(DEBUG_TAG, "Unable to update username", throwable)));
+                        throwable -> Log.e(DEBUG_TAG, "Unable to fetch cards", throwable)));
         return cards;
     }
 
@@ -100,13 +97,13 @@ public class CardFlipActivity extends AppCompatActivity {
 
         mRecyclerView.addOnItemTouchListener(new CardRecyclerTouchListener(this, mRecyclerView, new CardRecyclerTouchListener.ClickListener() {
             @Override
-            public void onClick(CardView view) {
+            public void onClick(FlashcardView view) {
                 Log.d(DEBUG_TAG, "click");
                 view.flipCard();
             }
 
             @Override
-            public void onLongClick(CardView view) {
+            public void onLongClick(FlashcardView view) {
                 Log.d(DEBUG_TAG, "longclick");
                 int pos = mRecyclerView.getChildAdapterPosition(view);
                 if (pos != -1) {
@@ -118,7 +115,7 @@ public class CardFlipActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFling(final CardView view, MotionEvent e1, MotionEvent e2, float velocityX,
+            public void onFling(final FlashcardView view, MotionEvent e1, MotionEvent e2, float velocityX,
                                 float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
                 if(cards.size() > 0 && view.isFlipped()) {
@@ -141,7 +138,7 @@ public class CardFlipActivity extends AppCompatActivity {
     }
 
 
-    private void startEditCardActivity(CardView view, int cardUid, int side){
+    private void startEditCardActivity(FlashcardView view, int cardUid, int side) {
         Intent intent = new Intent(this, EditCardActivity.class);
         intent.putExtra(EXTRA_CARD_UID, cardUid);
         intent.putExtra(EXTRA_CARD_SIDE, side);
@@ -152,12 +149,12 @@ public class CardFlipActivity extends AppCompatActivity {
 
             Pair<View, String> cardPair;
             Pair<View, String> textPair;
-            if (view.getSide() == 0){
+            if (view.getSide() == 0) {
                 cardPair = new Pair<>(view.findViewById(R.id.card_view_front),
                         getString(R.string.front_card_transition));
                 textPair = new Pair<>(view.findViewById(R.id.cardFrontTextView),
                         getString(R.string.frontET_transition));
-            }else{
+            } else {
                 cardPair = new Pair<>(view.findViewById(R.id.card_view_back),
                         getString(R.string.back_card_transition));
                 textPair = new Pair<>(view.findViewById(R.id.cardBackTextView),
@@ -165,7 +162,7 @@ public class CardFlipActivity extends AppCompatActivity {
             }
 
             ActivityOptions options = ActivityOptions
-                    .makeSceneTransitionAnimation(this,cardPair, textPair);
+                    .makeSceneTransitionAnimation(this, cardPair, textPair);
 
             startActivity(intent, options.toBundle());
 
@@ -173,7 +170,6 @@ public class CardFlipActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-
 
     @Override
     protected void onStop() {

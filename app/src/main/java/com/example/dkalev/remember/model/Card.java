@@ -9,10 +9,13 @@ import android.graphics.Bitmap;
 
 import java.sql.Blob;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 @Entity(foreignKeys = @ForeignKey(
         entity = Deck.class,
         parentColumns = "deck_id",
-        childColumns = "deck_id"))
+        //onDelete = CASCADE -> delete all cards when deleting the deck
+        childColumns = "deck_id", onDelete = CASCADE))
 public class Card {
 
     @PrimaryKey(autoGenerate = true)

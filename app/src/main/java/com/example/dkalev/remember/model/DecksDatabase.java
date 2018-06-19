@@ -20,8 +20,6 @@ public abstract class DecksDatabase extends RoomDatabase{
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             DecksDatabase.class, "Decks.db")
-                            //TODO remove when finished with schema
-                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

@@ -14,8 +14,6 @@ public interface DeckDataSource {
 
     void insertOrUpdateDeck(Deck... decks);
 
-    void deleteDeckCards(int deckId);
-
     void deleteDeck(Deck deck);
 
     Flowable<Card> getCard(int carId);

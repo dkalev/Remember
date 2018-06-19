@@ -1,9 +1,7 @@
 package com.example.dkalev.remember.flashcard;
 
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,7 +11,6 @@ import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.model.Card;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> {
 
@@ -25,12 +22,12 @@ public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> 
         private TextView mTextBack;
         private ImageView mImageFront;
         private ImageView mImageBack;
-        private CardView mCardLayout;
+        private FlashcardView mCardLayout;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mCardLayout = (CardView) itemView;
+            mCardLayout = (FlashcardView) itemView;
             mTextFront = itemView.findViewById(R.id.cardFrontTextView);
             mTextBack = itemView.findViewById(R.id.cardBackTextView);
             mImageFront = itemView.findViewById(R.id.imageViewFront);
@@ -47,8 +44,8 @@ public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CardView cardView = new CardView(parent.getContext());
-        return new ViewHolder(cardView);
+        FlashcardView flashcardView = new FlashcardView(parent.getContext());
+        return new ViewHolder(flashcardView);
     }
 
     @Override

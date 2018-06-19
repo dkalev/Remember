@@ -3,6 +3,7 @@ package com.example.dkalev.remember.model;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
@@ -27,8 +28,4 @@ public interface DeckDao {
 
     @Query("SELECT * FROM card WHERE :deckId == deck_id")
     Flowable<List<Card>> getCards(int deckId);
-
-    @Query("DELETE FROM card WHERE :deckId == deck_id")
-    void deleteCards(int deckId);
-
 }

@@ -5,8 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import com.example.dkalev.remember.flashcard.CardView;
-
 public class CardRecyclerTouchListener implements RecyclerView.OnItemTouchListener  {
 
     private GestureDetector mGestureDetector;
@@ -18,14 +16,14 @@ public class CardRecyclerTouchListener implements RecyclerView.OnItemTouchListen
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                CardView child = (CardView)rv.findChildViewUnder(e.getX(), e.getY());
+                FlashcardView child = (FlashcardView)rv.findChildViewUnder(e.getX(), e.getY());
                 mClickListener.onClick(child);
                 return true;
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
-                CardView child = (CardView) rv.findChildViewUnder(e.getX(), e.getY());
+                FlashcardView child = (FlashcardView) rv.findChildViewUnder(e.getX(), e.getY());
 
                 if (child != null && clickListener != null) {
                     clickListener.onLongClick(child);
@@ -34,7 +32,7 @@ public class CardRecyclerTouchListener implements RecyclerView.OnItemTouchListen
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                    float velocityY){
-                CardView child = (CardView) rv.findChildViewUnder(e1.getX(), e1.getY());
+                FlashcardView child = (FlashcardView) rv.findChildViewUnder(e1.getX(), e1.getY());
                 if (child != null && clickListener != null) {
                     clickListener.onFling(child, e1, e2, velocityX, velocityY);
                 }
@@ -59,11 +57,11 @@ public class CardRecyclerTouchListener implements RecyclerView.OnItemTouchListen
     }
 
     public interface ClickListener {
-        void onClick(CardView view);
+        void onClick(FlashcardView view);
 
-        void onLongClick(CardView view);
+        void onLongClick(FlashcardView view);
 
-        void onFling(CardView view, MotionEvent e1, MotionEvent e2, float velocityX,
+        void onFling(FlashcardView view, MotionEvent e1, MotionEvent e2, float velocityX,
                      float velocityY);
     }
 }

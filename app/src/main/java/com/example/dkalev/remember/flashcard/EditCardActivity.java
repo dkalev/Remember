@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.model.Card;
+import com.example.dkalev.remember.model.CardViewModel;
 import com.example.dkalev.remember.model.DeckViewModel;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
@@ -31,7 +32,7 @@ public class EditCardActivity extends AppCompatActivity {
 
 
     private static final String DEBUG_TAG = "EditCardActivity";
-    private DeckViewModel mViewModel;
+    private CardViewModel mViewModel;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private EditText frontET;
     private EditText backET;
@@ -48,7 +49,7 @@ public class EditCardActivity extends AppCompatActivity {
         backET = findViewById(R.id.cardBackEditText);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
+        mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModel.class);
 
         Intent intent = getIntent();
         int card_uid = intent.getIntExtra(CardFlipActivity.EXTRA_CARD_UID, 0);
@@ -77,6 +78,7 @@ public class EditCardActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
+
 
     private class TextEditorActionListener implements TextView.OnEditorActionListener {
 

@@ -27,7 +27,6 @@ public class Deck {
     private List<Card> cards;
 
     public Deck(String name) {
-        super();
         this.name = name;
         size = 0;
     }
