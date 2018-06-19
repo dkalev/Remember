@@ -24,6 +24,8 @@ import com.example.dkalev.remember.model.ViewModelFactory;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -34,8 +36,8 @@ public class CardFlipActivity extends AppCompatActivity {
     public static final String EXTRA_CARD_UID = "EXTRA_CARD_UID";
     public static final String EXTRA_CARD_SIDE = "EXTRA_CARD_UID";
 
+    @BindView(R.id.cardRecyclerView) RecyclerView mRecyclerView;
     private CardsAdapter mCardsAdapter;
-    private RecyclerView mRecyclerView;
 
     private DeckViewModel mViewModel;
 
@@ -47,6 +49,7 @@ public class CardFlipActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_flip);
+        ButterKnife.bind(this);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
@@ -81,7 +84,6 @@ public class CardFlipActivity extends AppCompatActivity {
 
     private void setupRecyclerView(ArrayList<Card> cards){
         mCardsAdapter = new CardsAdapter(cards);
-        mRecyclerView = findViewById(R.id.cardRecyclerView);
         mRecyclerView.setAdapter(mCardsAdapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
@@ -94,6 +96,7 @@ public class CardFlipActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(llm);
 
         mRecyclerView.setItemAnimator(new CardItemAnimator());
+
 
         mRecyclerView.addOnItemTouchListener(new CardRecyclerTouchListener(this, mRecyclerView, new CardRecyclerTouchListener.ClickListener() {
             @Override

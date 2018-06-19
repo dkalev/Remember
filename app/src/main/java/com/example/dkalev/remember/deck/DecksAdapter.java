@@ -15,24 +15,26 @@ import com.example.dkalev.remember.model.Deck;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class DecksAdapter extends RecyclerView.Adapter<DecksAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView mDeckName;
-        private TextView mNumCards;
+        @BindView(R.id.deckNameTextView) TextView mDeckName;
+        @BindView(R.id.numCardsTextView) TextView mNumCards;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mDeckName = itemView.findViewById(R.id.deckNameTextView);
-            mNumCards = itemView.findViewById(R.id.numCardsTextView);
+            ButterKnife.bind(this, itemView);
         }
     }
 
-    private List<com.example.dkalev.remember.model.Deck> mDecks;
+    private List<Deck> mDecks;
 
-    public DecksAdapter(List<com.example.dkalev.remember.model.Deck> decks){
+    public DecksAdapter(List<Deck> decks){
         mDecks = decks;
     }
 

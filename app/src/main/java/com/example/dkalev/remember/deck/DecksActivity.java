@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -51,11 +54,19 @@ public class DecksActivity extends AppCompatActivity {
 
     private static final int CREATE_DECK_ACTIVITY_REQUEST_CODE = 1;
 
+    @BindView(R.id.decksRecyclerView) RecyclerView mRecyclerView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @OnClick(R.id.fab)
+    public void createDeck(){
+        Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
+        startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_decks);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
         setupRecyclerView();
@@ -63,12 +74,6 @@ public class DecksActivity extends AppCompatActivity {
         //inject the viewModel / db dependencies
         mViewModelFactory = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModel.class);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-           Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
-           startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
-        });
     }
 
 
@@ -77,20 +82,19 @@ public class DecksActivity extends AppCompatActivity {
 
         mDecksAdapter = new DecksAdapter(mDecks);
 
-        RecyclerView rv = findViewById(R.id.decksRecyclerView);
 
-        rv.setAdapter(mDecksAdapter);
+        mRecyclerView.setAdapter(mDecksAdapter);
 
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        rv.addOnItemTouchListener(new DeckRecyclerTouchListener(this, rv, new DeckRecyclerTouchListener.ClickListener() {
+        mRecyclerView.addOnItemTouchListener(new DeckRecyclerTouchListener(this, mRecyclerView, new DeckRecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view) {
                 //if you click not on item returns -1 and crashes
-                if (rv.getChildAdapterPosition(view) != RecyclerView.NO_POSITION) {
+                if (mRecyclerView.getChildAdapterPosition(view) != RecyclerView.NO_POSITION) {
                     Log.d(DEBUG_TAG, "click");
                     Intent intent = new Intent(DecksActivity.this, CardFlipActivity.class);
-                    int pos = rv.getChildAdapterPosition(view);
+                    int pos = mRecyclerView.getChildAdapterPosition(view);
                     Deck deck = mDecks.get(pos);
                     intent.putExtra(DECK_ID_EXTRA, deck.getDeckId());
                     startActivity(intent);
@@ -100,7 +104,7 @@ public class DecksActivity extends AppCompatActivity {
             @Override
             public void onLongClick(View view) {
                 Log.d(DEBUG_TAG, "long click");
-                int pos = rv.getChildAdapterPosition(view);
+                int pos = mRecyclerView.getChildAdapterPosition(view);
                 Deck deck = mDecks.get(pos);
                 mDisposable.add(mViewModel.deleteDeck(deck)
                         .subscribeOn(Schedulers.io())
@@ -118,7 +122,7 @@ public class DecksActivity extends AppCompatActivity {
             @Override
             public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
-                Deck deck = mDecks.get(rv.getChildAdapterPosition(view));
+                Deck deck = mDecks.get(mRecyclerView.getChildAdapterPosition(view));
                 Card card = new Card(deck.getDeckId());
                 card.setTextFront("Front");
                 card.setTextBack("Back");

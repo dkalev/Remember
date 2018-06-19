@@ -12,26 +12,26 @@ import com.example.dkalev.remember.model.Card;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         private final String DEBUG_TAG = "CardsAdapter";
 
-        private TextView mTextFront;
-        private TextView mTextBack;
-        private ImageView mImageFront;
-        private ImageView mImageBack;
+        @BindView(R.id.cardFrontTextView) TextView mTextFront;
+        @BindView(R.id.cardBackTextView) TextView mTextBack;
+        @BindView(R.id.imageViewFront) ImageView mImageFront;
+        @BindView(R.id.imageViewBack) ImageView mImageBack;
         private FlashcardView mCardLayout;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             mCardLayout = (FlashcardView) itemView;
-            mTextFront = itemView.findViewById(R.id.cardFrontTextView);
-            mTextBack = itemView.findViewById(R.id.cardBackTextView);
-            mImageFront = itemView.findViewById(R.id.imageViewFront);
-            mImageBack = itemView.findViewById(R.id.imageViewBack);
+            ButterKnife.bind(this, itemView);
         }
     }
 

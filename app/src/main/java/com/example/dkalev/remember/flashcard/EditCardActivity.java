@@ -23,6 +23,8 @@ import com.example.dkalev.remember.model.DeckViewModel;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -34,8 +36,10 @@ public class EditCardActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "EditCardActivity";
     private CardViewModel mViewModel;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
-    private EditText frontET;
-    private EditText backET;
+    @BindView(R.id.cardFrontEditText) EditText frontET;
+    @BindView(R.id.cardBackEditText) EditText backET;
+    @BindView(R.id.card_edit_view_front) CardView front;
+    @BindView(R.id.card_edit_view_back) CardView back;
     private Card mCard;
     private int mCardSide;
 
@@ -43,10 +47,7 @@ public class EditCardActivity extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_card);
-        CardView front = findViewById(R.id.card_edit_view_front);
-        CardView back = findViewById(R.id.card_edit_view_back);
-        frontET = findViewById(R.id.cardFrontEditText);
-        backET = findViewById(R.id.cardBackEditText);
+        ButterKnife.bind(this);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModel.class);

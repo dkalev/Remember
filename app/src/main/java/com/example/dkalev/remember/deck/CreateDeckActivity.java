@@ -10,27 +10,34 @@ import android.widget.EditText;
 
 import com.example.dkalev.remember.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class CreateDeckActivity extends AppCompatActivity {
 
     public static final String EXTRA_REPLY = "com.example.android.createdeckview.REPLY";
+    @BindView(R.id.deckNameEditText) EditText deckNameET;
+
+    @OnClick(R.id.newDeckButton)
+    public void submit(){
+        Intent replyIntent = new Intent();
+        if (TextUtils.isEmpty(deckNameET.getText())) {
+            setResult(RESULT_CANCELED, replyIntent);
+        } else {
+            String deckName = deckNameET.getText().toString();
+            replyIntent.putExtra(EXTRA_REPLY, deckName);
+            setResult(RESULT_OK, replyIntent);
+        }
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_deck);
+        ButterKnife.bind(this);
 
-        EditText deckNameTextView = findViewById(R.id.deckNameTextView);
-        Button createDeckButton = findViewById(R.id.newDeckButton);
 
-        createDeckButton.setOnClickListener(v -> {
-            Intent replyIntent = new Intent();
-            if (TextUtils.isEmpty(deckNameTextView.getText())) {
-                setResult(RESULT_CANCELED, replyIntent);
-            } else {
-                String deckName = deckNameTextView.getText().toString();
-                replyIntent.putExtra(EXTRA_REPLY, deckName);
-                setResult(RESULT_OK, replyIntent);
-            }
-            finish();
-        });
     }
 }
