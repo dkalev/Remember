@@ -52,6 +52,7 @@ public class CardsAdapter extends RecyclerView.Adapter<CardsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 
         Card card = mCards.get(position);
+        holder.mCardLayout.setTag(position);
 
         TextView tv = holder.mTextFront;
         tv.setText(card.getTextFront());

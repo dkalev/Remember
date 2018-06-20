@@ -16,22 +16,16 @@ public class DeckViewModel extends ViewModel {
 
     private final DeckDataSource mDataSource;
 
-    private Flowable<List<Deck>> decks;
-
     public DeckViewModel(DeckDataSource dataSource){
         mDataSource = dataSource;
     }
 
     public Flowable<List<Deck>> getAllDecks() {
-        if(decks == null)
-            decks = mDataSource.getAllDecks();
-        return decks;
+        return mDataSource.getAllDecks();
     }
 
     public Flowable<Deck> getDeck(int deckId){
-        if(decks == null)
-            getAllDecks();
-        return Flowable.zip(decks.flatMapIterable(list -> list)
+        return Flowable.zip(mDataSource.getAllDecks().flatMapIterable(list -> list)
                         .filter(d -> d.getDeckId() == deckId)
                 ,mDataSource.getDeckCards(deckId),
                 (deck, cards) -> {
@@ -41,24 +35,21 @@ public class DeckViewModel extends ViewModel {
     }
 
     public Completable addDecks(Deck... decks){
-        return Completable.fromCallable(() -> {
+        return Completable.fromAction(() -> {
             mDataSource.insertOrUpdateDeck(decks);
-            return "Done";
         });
     }
 
     public Completable deleteDeck(Deck deck) {
-        return Completable.fromCallable(() -> {
+        return Completable.fromAction(() -> {
             mDataSource.deleteDeck(deck);
-            return "Done";
         });
     }
 
     //todo remove later
     public Completable addCard(Card card){
-        return Completable.fromCallable(() -> {
+        return Completable.fromAction(() -> {
             mDataSource.insertCard(card);
-            return "Done";
         });
     }
 }

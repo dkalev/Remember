@@ -56,11 +56,6 @@ public class DecksActivity extends AppCompatActivity {
 
     @BindView(R.id.decksRecyclerView) RecyclerView mRecyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @OnClick(R.id.fab)
-    public void createDeck(){
-        Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
-        startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +71,16 @@ public class DecksActivity extends AppCompatActivity {
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModel.class);
     }
 
+    @OnClick(R.id.fab)
+    public void createDeck(){
+        Intent intent = new Intent(DecksActivity.this, CreateDeckActivity.class);
+        startActivityForResult(intent, CREATE_DECK_ACTIVITY_REQUEST_CODE);
+    }
 
     private void setupRecyclerView(){
         mDecks = new ArrayList<>();
 
         mDecksAdapter = new DecksAdapter(mDecks);
-
 
         mRecyclerView.setAdapter(mDecksAdapter);
 

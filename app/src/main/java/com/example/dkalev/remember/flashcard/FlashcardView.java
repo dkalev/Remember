@@ -78,6 +78,7 @@ public class FlashcardView extends ConstraintLayout {
 
     }
 
+
     public void flipCard(){
         if (mFront.getVisibility() == View.GONE) {
             mLeft_in.start();

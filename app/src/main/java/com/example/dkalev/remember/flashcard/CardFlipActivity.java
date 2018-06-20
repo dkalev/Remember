@@ -108,13 +108,11 @@ public class CardFlipActivity extends AppCompatActivity {
             @Override
             public void onLongClick(FlashcardView view) {
                 Log.d(DEBUG_TAG, "longclick");
-                int pos = mRecyclerView.getChildAdapterPosition(view);
-                if (pos != -1) {
+                    int pos = (int)view.getTag();
                     Card card = mCards.get(pos);
                     int side = view.getSide();
-                    Log.d(DEBUG_TAG, "card uid:" + card.getUid());
+                    Log.d(DEBUG_TAG, "view pos :" + pos + "card uid: " + card.getUid());
                     startEditCardActivity(view, card.getUid(), side);
-                }
             }
 
             @Override

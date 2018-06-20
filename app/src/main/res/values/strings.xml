@@ -13,7 +13,7 @@
     <string name="create_deck">Create deck</string>
     <string name="deck_size">Deck size</string>
     <string name="deck_name">Deck name</string>
-    <string name="front_card_transition">frontCardVIew</string>
+    <string name="front_card_transition">front_card_transition</string>
     <string name="back_card_transition">back_card_transition</string>
     <string name="frontET_transition">front_ET_transition</string>
     <string name="backET_transition">back_ET_transition</string>

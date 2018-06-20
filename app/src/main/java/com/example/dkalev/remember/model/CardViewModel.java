@@ -8,36 +8,52 @@ import io.reactivex.Flowable;
 public class CardViewModel extends ViewModel {
 
     private final DeckDataSource mDataSource;
-    private Flowable<Card> mCard;
+    private Card mCard;
 
     public CardViewModel(DeckDataSource dataSource){
         mDataSource = dataSource;
     }
 
-    public Flowable<Card> getCard(int card_uid){
-        if(mCard == null)
-            mCard = mDataSource.getCard(card_uid);
-        return mCard;
+    public Flowable<String> getTextFront(int card_uid){
+        return mDataSource.getCard(card_uid)
+                .map(card -> {
+                    mCard = card;
+                    return card.getTextFront();
+                });
     }
 
-    public Completable addCard(Card card){
-        return Completable.fromCallable(() -> {
-            mDataSource.insertCard(card);
-            return "Done";
+    public Flowable<String> getTextBack(int card_uid){
+        return mDataSource.getCard(card_uid)
+                .map(card -> {
+                    mCard = card;
+                    return card.getTextBack();
+                });
+    }
+
+    public Completable setTextFront(final String textFront){
+        return Completable.fromAction(()->{
+            Card card = new Card(mCard.getDeckId());
+            card.setUid(mCard.getUid());
+            card.setTextFront(textFront);
+            card.setTextBack(mCard.getTextBack());
+            mCard = card;
+            mDataSource.updateCard(mCard);
         });
     }
 
-    public Completable updateCard(Card card){
-        return Completable.fromCallable(() -> {
-            mDataSource.updateCard(card);
-            return "Done";
+    public Completable setTextBack(final String textBack){
+        return Completable.fromAction(()->{
+            Card card = new Card(mCard.getDeckId());
+            card.setUid(mCard.getUid());
+            card.setTextFront(mCard.getTextFront());
+            card.setTextBack(textBack);
+            mCard = card;
+            mDataSource.updateCard(mCard);
         });
     }
 
-    public Completable deleteCard(Card card){
-        return Completable.fromCallable(() -> {
-            mDataSource.deleteCard(card);
-            return "Done";
-        });
+
+    public Completable deleteCard(){
+        return Completable.fromAction(() -> mDataSource.deleteCard(mCard));
     }
 }
