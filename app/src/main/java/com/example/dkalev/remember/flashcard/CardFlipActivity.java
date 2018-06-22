@@ -18,7 +18,7 @@ import android.view.View;
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.deck.DecksActivity;
 import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.DeckViewModel;
+import com.example.dkalev.remember.model.DeckViewModelKT;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
 
@@ -39,7 +39,7 @@ public class CardFlipActivity extends AppCompatActivity {
     @BindView(R.id.cardRecyclerView) RecyclerView mRecyclerView;
     private CardsAdapter mCardsAdapter;
 
-    private DeckViewModel mViewModel;
+    private DeckViewModelKT mViewModel;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -52,7 +52,7 @@ public class CardFlipActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
+        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModelKT.class);
 
         mDeckId = getIntent().getIntExtra(DecksActivity.DECK_ID_EXTRA, 0);
 

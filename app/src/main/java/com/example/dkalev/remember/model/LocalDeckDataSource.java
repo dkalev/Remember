@@ -38,8 +38,8 @@ public class LocalDeckDataSource implements DeckDataSource {
 
 
     @Override
-    public void deleteDeck(Deck deck) {
-        mDeckDao.delete(deck);
+    public void deleteDeck(int deckId) {
+        mDeckDao.delete(deckId);
     }
 
 

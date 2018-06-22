@@ -3,7 +3,6 @@ package com.example.dkalev.remember.flashcard;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -18,30 +17,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dkalev.remember.R;
-import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.CardViewModel;
-import com.example.dkalev.remember.model.DeckViewModel;
+import com.example.dkalev.remember.model.CardViewModelKT;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class EditCardActivity extends AppCompatActivity {
 
 
     private static final String DEBUG_TAG = "EditCardActivity";
-    private CardViewModel mViewModel;
+    private CardViewModelKT mViewModel;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     @BindView(R.id.cardFrontEditText) EditText frontET;
     @BindView(R.id.cardBackEditText) EditText backET;
     @BindView(R.id.card_edit_view_front) CardView front;
     @BindView(R.id.card_edit_view_back) CardView back;
-    private Card mCard;
     private int mCardSide;
 
     @Override
@@ -51,7 +44,7 @@ public class EditCardActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModel.class);
+        mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModelKT.class);
 
         Intent intent = getIntent();
         int card_uid = intent.getIntExtra(CardFlipActivity.EXTRA_CARD_UID, 0);
@@ -84,9 +77,7 @@ public class EditCardActivity extends AppCompatActivity {
 
     private void updateTextFront(final String textFront){
         mDisposable.add(mViewModel.setTextFront(textFront)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(()->{
+                .subscribe(()->{
                     Toast.makeText(
                             getApplicationContext(),
                             "Updated front with: "+ textFront,
@@ -97,8 +88,6 @@ public class EditCardActivity extends AppCompatActivity {
 
     private void updateTextBack(final String textBack){
         mDisposable.add(mViewModel.setTextBack(textBack)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(()->{
                             Toast.makeText(
                                     getApplicationContext(),
@@ -111,8 +100,6 @@ public class EditCardActivity extends AppCompatActivity {
     private void getCard(int card_uid){
         Log.d(DEBUG_TAG, "card uid: "+card_uid);
         mDisposable.add(mViewModel.getTextFront(card_uid)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(textFront -> {
                     Toast.makeText(
                             getApplicationContext(),
@@ -122,8 +109,6 @@ public class EditCardActivity extends AppCompatActivity {
                 throwable -> Log.e(DEBUG_TAG, "Unable to retrieve card", throwable)));
 
         mDisposable.add(mViewModel.getTextBack(card_uid)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(textBack -> backET.setText(textBack)));
     }
 
@@ -132,6 +117,11 @@ public class EditCardActivity extends AppCompatActivity {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             Log.d(DEBUG_TAG, "action id " + actionId + ", key event " + event);
+//            if (actionId == EditorInfo.IME_NULL
+//                    && event.getAction() == KeyEvent.ACTION_DOWN) {
+//                example_confirm();//match this behavior to your 'Send' (or Confirm) button
+//            }
+//            return true;
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                     actionId == EditorInfo.IME_ACTION_DONE ||
                     (event != null &&

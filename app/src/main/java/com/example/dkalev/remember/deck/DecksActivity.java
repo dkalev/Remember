@@ -1,12 +1,8 @@
 package com.example.dkalev.remember.deck;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,36 +15,26 @@ import android.widget.Toast;
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.flashcard.CardFlipActivity;
 import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.Deck;
-import com.example.dkalev.remember.model.DeckViewModel;
+import com.example.dkalev.remember.model.DeckViewModelKT;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class DecksActivity extends AppCompatActivity {
 
     private ViewModelFactory mViewModelFactory;
 
-    private DeckViewModel mViewModel;
+    private DeckViewModelKT mViewModel;
 
     private DecksAdapter mDecksAdapter;
 
     private final static String DEBUG_TAG = "DecksActivity";
 
     public static final String DECK_ID_EXTRA = "com.example.android.decksactivity.deckid";
-
-    private List<Deck> mDecks;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -68,7 +54,7 @@ public class DecksActivity extends AppCompatActivity {
 
         //inject the viewModel / db dependencies
         mViewModelFactory = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModel.class);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModelKT.class);
     }
 
     @OnClick(R.id.fab)
@@ -78,9 +64,8 @@ public class DecksActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(){
-        mDecks = new ArrayList<>();
 
-        mDecksAdapter = new DecksAdapter(mDecks);
+        mDecksAdapter = new DecksAdapter();
 
         mRecyclerView.setAdapter(mDecksAdapter);
 
@@ -93,9 +78,7 @@ public class DecksActivity extends AppCompatActivity {
                 if (mRecyclerView.getChildAdapterPosition(view) != RecyclerView.NO_POSITION) {
                     Log.d(DEBUG_TAG, "click");
                     Intent intent = new Intent(DecksActivity.this, CardFlipActivity.class);
-                    int pos = mRecyclerView.getChildAdapterPosition(view);
-                    Deck deck = mDecks.get(pos);
-                    intent.putExtra(DECK_ID_EXTRA, deck.getDeckId());
+                    intent.putExtra(DECK_ID_EXTRA, (int) view.getTag());
                     startActivity(intent);
                 }
             }
@@ -103,31 +86,21 @@ public class DecksActivity extends AppCompatActivity {
             @Override
             public void onLongClick(View view) {
                 Log.d(DEBUG_TAG, "long click");
-                int pos = mRecyclerView.getChildAdapterPosition(view);
-                Deck deck = mDecks.get(pos);
-                mDisposable.add(mViewModel.deleteDeck(deck)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                                    mDecks.remove(deck);
-                                    mDecksAdapter.notifyItemRemoved(pos);
-                                    Toast.makeText(
-                                            getApplicationContext(),
-                                            "Deck deleted",
-                                            Toast.LENGTH_LONG).show();},
+                mDisposable.add(mViewModel.deleteDeck((int) view.getTag())
+                        .subscribe(() -> Toast.makeText(
+                                getApplicationContext(),
+                                "Deck deleted",
+                                Toast.LENGTH_LONG).show(),
                                 throwable -> Log.e(DEBUG_TAG, "Unable to delete deck", throwable)));
             }
 
             @Override
             public void onFling(View view, MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "fling");
-                Deck deck = mDecks.get(mRecyclerView.getChildAdapterPosition(view));
-                Card card = new Card(deck.getDeckId());
+                Card card = new Card((int) view.getTag());
                 card.setTextFront("Front");
                 card.setTextBack("Back");
                 mDisposable.add(mViewModel.addCard(card)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(() ->
                             Log.d(DEBUG_TAG, "Card added")
                     ,throwable -> Log.e(DEBUG_TAG, "Unable to add deck", throwable)));
@@ -138,16 +111,9 @@ public class DecksActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CREATE_DECK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            Deck deck = new Deck(data.getStringExtra(CreateDeckActivity.EXTRA_REPLY));
-            mDisposable.add(mViewModel.addDecks(deck)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> {
-                        mDecksAdapter.notifyItemInserted(mDecksAdapter.getItemCount());
-                        Toast.makeText(
-                            getApplicationContext(),
-                            "Added new deck",
-                            Toast.LENGTH_LONG).show();},
+            final String deckName = data.getStringExtra(CreateDeckActivity.EXTRA_REPLY);
+            mDisposable.add(mViewModel.addDeck(deckName)
+                    .subscribe(() -> mDecksAdapter.notifyItemInserted(mDecksAdapter.getItemCount()),
                             throwable -> Log.e(DEBUG_TAG, "Unable to add deck", throwable)));
         } else {
             Toast.makeText(
@@ -164,13 +130,7 @@ public class DecksActivity extends AppCompatActivity {
         // Update the decks recyclerview, at every onNext emission.
         // In case of error, log the exception.
         mDisposable.add(mViewModel.getAllDecks()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(decks -> {
-                    //will be better if update just the difference
-                    mDecks.clear();
-                    mDecks.addAll(decks);
-                    mDecksAdapter.notifyDataSetChanged();},
+                .subscribe(decks -> mDecksAdapter.setDeckList(decks),
                         throwable -> Log.e(DEBUG_TAG, "Unable to get decks", throwable)));
     }
 
