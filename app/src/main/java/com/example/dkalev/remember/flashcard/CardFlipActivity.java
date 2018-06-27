@@ -5,20 +5,23 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.animation.FlingAnimation;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.util.Log;
 import android.util.Pair;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.deck.DecksActivity;
 import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.DeckViewModelKT;
+import com.example.dkalev.remember.model.DeckViewModel;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
 
@@ -37,9 +40,10 @@ public class CardFlipActivity extends AppCompatActivity {
     public static final String EXTRA_CARD_SIDE = "EXTRA_CARD_UID";
 
     @BindView(R.id.cardRecyclerView) RecyclerView mRecyclerView;
+
     private CardsAdapter mCardsAdapter;
 
-    private DeckViewModelKT mViewModel;
+    private DeckViewModel mViewModel;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -52,7 +56,7 @@ public class CardFlipActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         ViewModelFactory vmf = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModelKT.class);
+        mViewModel = ViewModelProviders.of(this, vmf).get(DeckViewModel.class);
 
         mDeckId = getIntent().getIntExtra(DecksActivity.DECK_ID_EXTRA, 0);
 
@@ -95,7 +99,13 @@ public class CardFlipActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(llm);
 
-        mRecyclerView.setItemAnimator(new CardItemAnimator());
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator(){
+            //handle disappearance by swiping the cards
+            @Override
+            public boolean animateDisappearance(@NonNull RecyclerView.ViewHolder viewHolder, @NonNull ItemHolderInfo preLayoutInfo, @Nullable ItemHolderInfo postLayoutInfo) {
+                return false;
+            }
+        });
 
 
         mRecyclerView.addOnItemTouchListener(new CardRecyclerTouchListener(this, mRecyclerView, new CardRecyclerTouchListener.ClickListener() {
@@ -116,22 +126,27 @@ public class CardFlipActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFling(final FlashcardView view, MotionEvent e1, MotionEvent e2, float velocityX,
-                                float velocityY) {
+            public void onSwipe(final FlashcardView view, int swipe_type) {
                 Log.d(DEBUG_TAG, "fling");
                 if(cards.size() > 0 && view.isFlipped()) {
-                    FlingAnimation flingX = new FlingAnimation(view, FlingAnimation.TRANSLATION_X).setFriction(1.1f);
-                    FlingAnimation flingY = new FlingAnimation(view, FlingAnimation.TRANSLATION_Y).setFriction(1.1f);
-
-                    flingX.setStartVelocity(velocityX);
-                    flingY.setStartVelocity(velocityY);
-
-                    flingX.start();
-                    flingY.start();
-                    flingX.addEndListener((animation, canceled, value, velocity) -> {
-                        cards.remove(0);
-                        mRecyclerView.getAdapter().notifyItemRemoved(0);
-                    });
+                    if (swipe_type == CardRecyclerTouchListener.SWIPE_OUT){
+                        view.animate()
+                                .translationX(view.getTranslationX()*10)
+                                .translationY(view.getTranslationY()*10)
+                                .setInterpolator(new AccelerateInterpolator())
+                                .withEndAction(() -> {
+                                    cards.remove(0);
+                                    mRecyclerView.getAdapter().notifyItemRemoved(0);
+                                })
+                                .start();
+                    }else{
+                        view.animate()
+                                .translationX(0)
+                                .translationY(0)
+                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .start();
+                    }
+                }else{
                     //todo open next activity when out of cards
                 }
             }

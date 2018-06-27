@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_layout"
     android:layout_width="0dp"
     android:layout_height="0dp">
@@ -34,6 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/next"
+            android:textSize="18sp"
+            android:gravity="center"
             android:textAlignment="center" />
     </android.support.v7.widget.CardView>
 
@@ -59,14 +62,17 @@
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/imageViewBack"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_book_black_18dp"/>
 
         <TextView
             android:id="@+id/cardBackTextView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/skip"
+            android:textSize="18sp"
+            android:gravity="center"
             android:textAlignment="center" />
     </android.support.v7.widget.CardView>
-
 </android.support.constraint.ConstraintLayout>

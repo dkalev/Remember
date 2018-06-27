@@ -7,7 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
-class DeckViewModelKT(dataSource: DeckDataSource) : ViewModel() {
+class DeckViewModel(dataSource: DeckDataSource) : ViewModel() {
     private var mDataSource: DeckDataSource? = null
     private var mDecks: Flowable<List<Deck>>? = null
 

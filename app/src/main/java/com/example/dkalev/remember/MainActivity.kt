@@ -1,10 +1,9 @@
 package com.example.dkalev.remember
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import com.example.dkalev.remember.deck.DecksActivity
-import com.example.dkalev.remember.flashcard.CardFlipActivity
 
 class MainActivity : AppCompatActivity() {
 

@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -25,7 +24,6 @@ public class FlashcardView extends ConstraintLayout {
     private AnimatorSet mRight_in;
     private AnimatorSet mRight_out;
 
-    private ConstraintLayout mLayout;
     private boolean flipped;
 
     public FlashcardView(@NonNull Context context) {
@@ -49,9 +47,6 @@ public class FlashcardView extends ConstraintLayout {
 
         mFront = findViewById(R.id.card_view_front);
         mBack = findViewById(R.id.card_view_back);
-
-//        mFront.setOnTouchListener(new FlashcardOnTouchListener(context));
-//        mBack.setOnTouchListener(new FlashcardOnTouchListener(context));
 
         //get display metrics
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);

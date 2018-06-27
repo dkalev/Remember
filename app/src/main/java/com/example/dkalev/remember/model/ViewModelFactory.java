@@ -14,11 +14,11 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if ( modelClass.isAssignableFrom(DeckViewModelKT.class))
-            return (T) new DeckViewModelKT(mDataSource);
+        if ( modelClass.isAssignableFrom(DeckViewModel.class))
+            return (T) new DeckViewModel(mDataSource);
 
-        if ( modelClass.isAssignableFrom(CardViewModelKT.class))
-            return (T) new CardViewModelKT(mDataSource);
+        if ( modelClass.isAssignableFrom(CardViewModel.class))
+            return (T) new CardViewModel(mDataSource);
 
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

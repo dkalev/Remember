@@ -3,69 +3,56 @@ package com.example.dkalev.remember.flashcard
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.CardView
 import android.text.InputType
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.example.dkalev.remember.R
-import com.example.dkalev.remember.model.CardViewModelKT
+import com.example.dkalev.remember.model.CardViewModel
 import com.example.dkalev.remember.model.Injection
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_edit_card.*
 
 
-
-class EditCardActivityKT : AppCompatActivity() {
-    private var mViewModel: CardViewModelKT? = null
+class EditCardActivity : AppCompatActivity() {
+    private var mViewModel: CardViewModel? = null
     private val mDisposable = CompositeDisposable()
-    @BindView(R.id.cardFrontEditText)
-    internal var frontET: EditText? = null
-    @BindView(R.id.cardBackEditText)
-    internal var backET: EditText? = null
-    @BindView(R.id.card_edit_view_front)
-    internal var front: CardView? = null
-    @BindView(R.id.card_edit_view_back)
-    internal var back: CardView? = null
     private var mCardSide: Int = 0
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_card)
-        ButterKnife.bind(this)
 
         val vmf = Injection.provideViewModelFactory(this)
-        mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModelKT::class.java!!)
+        mViewModel = ViewModelProviders.of(this, vmf).get(CardViewModel::class.java)
 
         val intent = intent
-        val card_uid = intent.getIntExtra(CardFlipActivity.EXTRA_CARD_UID, 0)
+        val cardUid = intent.getIntExtra(CardFlipActivity.EXTRA_CARD_UID, 0)
         mCardSide = intent.getIntExtra(CardFlipActivity.EXTRA_CARD_SIDE, 0)
 
-        Log.d(DEBUG_TAG, "card_uid: $card_uid")
+        Log.d(DEBUG_TAG, "cardUid: $cardUid")
         //editor action listener does not work otherwise
-        frontET!!.maxLines = 1
-        frontET!!.inputType = InputType.TYPE_CLASS_TEXT
-        backET!!.maxLines = 1
-        backET!!.inputType = InputType.TYPE_CLASS_TEXT
+        cardFrontEditText!!.maxLines = 1
+        cardFrontEditText!!.inputType = InputType.TYPE_CLASS_TEXT
+        cardBackEditText!!.maxLines = 1
+        cardBackEditText!!.inputType = InputType.TYPE_CLASS_TEXT
 
         if (mCardSide == 1) {
-            front!!.visibility = View.GONE
-            back!!.visibility = View.VISIBLE
-            backET!!.setOnEditorActionListener(TextEditorActionListener())
-            backET!!.onFocusChangeListener = TextOnFocusChangeListener()
+            cardEditViewFront!!.visibility = View.GONE
+            cardEditViewBack!!.visibility = View.VISIBLE
+            cardBackEditText!!.setOnEditorActionListener(TextEditorActionListener())
+            cardBackEditText!!.onFocusChangeListener = TextOnFocusChangeListener()
         } else {
-            frontET!!.setOnEditorActionListener(TextEditorActionListener())
-            frontET!!.onFocusChangeListener = TextOnFocusChangeListener()
+            cardFrontEditText!!.setOnEditorActionListener(TextEditorActionListener())
+            cardFrontEditText!!.onFocusChangeListener = TextOnFocusChangeListener()
 
         }
 
-        getCard(card_uid)
+        getCard(cardUid)
 
         //show hide keyboards
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
@@ -103,12 +90,12 @@ class EditCardActivityKT : AppCompatActivity() {
                             applicationContext,
                             "Got front: $textFront",
                             Toast.LENGTH_LONG).show()
-                    frontET!!.setText(textFront)
+                    cardFrontEditText!!.setText(textFront)
                 }
                 ) { throwable -> Log.e(DEBUG_TAG, "Unable to retrieve card", throwable) })
 
         mDisposable.add(mViewModel!!.getTextBack(card_uid)
-                .subscribe { textBack -> backET!!.setText(textBack) })
+                .subscribe { textBack -> cardBackEditText!!.setText(textBack) })
     }
 
     private inner class TextEditorActionListener : TextView.OnEditorActionListener {

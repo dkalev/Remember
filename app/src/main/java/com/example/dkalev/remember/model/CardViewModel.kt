@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class CardViewModelKT(dataSource: DeckDataSource) : ViewModel() {
+class CardViewModel(dataSource: DeckDataSource) : ViewModel() {
 
     private var mDataSource: DeckDataSource? = null
     private var mCard: Card? = null

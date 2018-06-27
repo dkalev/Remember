@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.example.dkalev.remember.R;
 import com.example.dkalev.remember.flashcard.CardFlipActivity;
 import com.example.dkalev.remember.model.Card;
-import com.example.dkalev.remember.model.DeckViewModelKT;
+import com.example.dkalev.remember.model.DeckViewModel;
 import com.example.dkalev.remember.model.Injection;
 import com.example.dkalev.remember.model.ViewModelFactory;
 
@@ -28,7 +28,7 @@ public class DecksActivity extends AppCompatActivity {
 
     private ViewModelFactory mViewModelFactory;
 
-    private DeckViewModelKT mViewModel;
+    private DeckViewModel mViewModel;
 
     private DecksAdapter mDecksAdapter;
 
@@ -54,7 +54,7 @@ public class DecksActivity extends AppCompatActivity {
 
         //inject the viewModel / db dependencies
         mViewModelFactory = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModelKT.class);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DeckViewModel.class);
     }
 
     @OnClick(R.id.fab)
