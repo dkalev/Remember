@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/decksFragment">
 
+    <fragment
+        android:id="@+id/cardFlipFragment"
+        android:name="com.example.dkalev.remember.flashcard.CardFlipFragment"
+        android:label="CardFlipFragment" >
+        <argument
+            android:name="deckId"
+            android:defaultValue="0"
+            app:type="integer" />
+        <action
+            android:id="@+id/action_cardFlipFragment_to_editCardFragment"
+            app:destination="@id/editCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createDeckFragment"
+        android:name="com.example.dkalev.remember.deck.CreateDeckFragment"
+        android:label="CreateDeckFragment" ></fragment>
+    <fragment
+        android:id="@+id/decksFragment"
+        android:name="com.example.dkalev.remember.deck.DecksFragment"
+        android:label="DecksFragment" >
+        <action
+            android:id="@+id/action_decksFragment_to_createDeckFragment"
+            app:destination="@id/createDeckFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_decksFragment_to_cardFlipFragment"
+            app:destination="@id/cardFlipFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editCardFragment"
+        android:name="com.example.dkalev.remember.flashcard.EditCardFragment"
+        android:label="EditCardFragment" >
+        <argument
+            android:name="cardUid"
+            android:defaultValue="0"
+            app:type="integer" />
+        <argument
+            android:name="cardSide"
+            android:defaultValue="0"
+            app:type="integer" />
+    </fragment>
 </navigation>
