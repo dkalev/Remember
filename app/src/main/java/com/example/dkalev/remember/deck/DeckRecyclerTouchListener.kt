@@ -21,7 +21,7 @@ class DeckRecyclerTouchListener(context: Context, rv: RecyclerView, private val 
                 val child = rv.findChildViewUnder(e.x, e.y)
 
                 if (child != null && mClickListener != null) {
-                    mClickListener!!.onLongClick(child)
+                    mClickListener.onLongClick(child)
                 }
             }
 
@@ -29,7 +29,7 @@ class DeckRecyclerTouchListener(context: Context, rv: RecyclerView, private val 
                                  velocityY: Float): Boolean {
                 val child = rv.findChildViewUnder(e1.x, e1.y)
                 if (child != null && mClickListener != null) {
-                    mClickListener!!.onFling(child, e1, e2, velocityX, velocityY)
+                    mClickListener.onFling(child, e1, e2, velocityX, velocityY)
                 }
                 return true
             }

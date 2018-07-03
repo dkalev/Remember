@@ -44,7 +44,7 @@ class CreateDeckFragment: Fragment(){
                         .subscribe({
                             //hide keyboard
                             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            imm!!.hideSoftInputFromWindow(view.windowToken, 0)
+                            imm.hideSoftInputFromWindow(view.windowToken, 0)
                             //get back to decks fragment
                             val bundle = Bundle()
                             bundle.putString(CardFlipFragment.deckNameKey, deckName)

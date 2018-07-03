@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.ButterKnife
 import com.example.dkalev.remember.R
 import com.example.dkalev.remember.model.Deck
 import kotlinx.android.synthetic.main.deck_item.view.*
@@ -19,10 +18,7 @@ class DecksAdapter : RecyclerView.Adapter<DecksAdapter.ViewHolder>() {
         
         internal var deckNameTV = itemView.deckNameTextView
         internal var numCardsTV = itemView.numCardsTextView
-        
-        init {
-            ButterKnife.bind(this, itemView)
-        }
+
     }
 
     fun setDeckList(decks: List<Deck>) {
