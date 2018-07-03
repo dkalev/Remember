@@ -1,6 +1,8 @@
 package com.example.dkalev.remember.deck
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -14,24 +16,32 @@ import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.dkalev.remember.R
 import com.example.dkalev.remember.flashcard.CardFlipFragment
-import com.example.dkalev.remember.model.Card
-import com.example.dkalev.remember.model.DeckViewModel
-import com.example.dkalev.remember.model.Injection
+import com.example.dkalev.remember.model.card.Card
+import com.example.dkalev.remember.viewmodel.DeckViewModel
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_decks.*
 import kotlinx.android.synthetic.main.deck_item.view.*
+import javax.inject.Inject
 
 class DecksFragment: Fragment() {
-    
-    private var viewModel: DeckViewModel? = null
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var deckViewModel: DeckViewModel
     private val disposable = CompositeDisposable()
     
     private val DEBUGTAG = "DecksFragment"
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val vmf = Injection.provideViewModelFactory(context!!)
-        viewModel = ViewModelProviders.of(activity!!, vmf).get(DeckViewModel::class.java)
+        deckViewModel = ViewModelProviders.of(this, viewModelFactory).get(DeckViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
     
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -67,7 +77,7 @@ class DecksFragment: Fragment() {
 
             override fun onLongClick(view: View?) {
                 Log.d(DEBUGTAG, "long click")
-                disposable.add(viewModel!!.deleteDeck(view!!.deckNameTextView.text.toString())
+                disposable.add(deckViewModel.deleteDeck(view!!.deckNameTextView.text.toString())
                         .subscribe({
 //                            decksRecyclerView.adapter!!.notifyItemRemoved(view.tag as Int)
                             Toast.makeText(
@@ -83,7 +93,7 @@ class DecksFragment: Fragment() {
                 val card = Card(view!!.deckNameTextView.text.toString())
                 card.textFront = "Front"
                 card.textBack = "Back"
-                disposable.add(viewModel!!.addCard(card)
+                disposable.add(deckViewModel.addCard(card)
                         .subscribe({ Log.d(DEBUGTAG, "Card added") }, { throwable -> Log.e(DEBUGTAG, "Unable to add deck", throwable) }))
             }
         }))
@@ -91,11 +101,12 @@ class DecksFragment: Fragment() {
 
     private fun getAllDecks(){
         Log.d(DEBUGTAG, "gettin deckin")
-        disposable.add(viewModel!!.getAllDecks()
+        disposable.add(deckViewModel.getAllDecks()
         !!.subscribe({decks ->
             run {
                 val adapter = decksRecyclerView.adapter as DecksAdapter
                 adapter.setDeckList(decks)
+                Log.d(DEBUGTAG, "deck size ${decks.size}")
             }
         },
                 {throwable -> Log.e(DEBUGTAG, "Unable to get decks", throwable)}

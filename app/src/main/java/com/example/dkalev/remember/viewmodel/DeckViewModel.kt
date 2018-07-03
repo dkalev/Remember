@@ -36,13 +36,13 @@ class DeckViewModel(dataSource: DeckDataSource) : ViewModel() {
         return mDecks
     }
 
-    fun getDeck(deckId: Int): Flowable<Deck> {
+    fun getDeck(deckName: String): Flowable<Deck> {
         if (mDecks == null)
             loadDecks()
         return Flowable.zip(
                 mDecks!!.flatMapIterable { list -> list }
-                        .filter { d -> d.deckId == deckId },
-                mDataSource!!.getDeckCards(deckId),
+                        .filter { d -> d.name == deckName },
+                mDataSource!!.getDeckCards(deckName),
                 BiFunction{deck: Deck, cards: List<Card> ->
                     deck.cards = cards
                  deck})
@@ -55,8 +55,8 @@ class DeckViewModel(dataSource: DeckDataSource) : ViewModel() {
         return updateDB { mDataSource?.insertOrUpdateDeck(deck) }
     }
 
-    fun deleteDeck(deckId: Int): Completable {
-        return updateDB { mDataSource?.deleteDeck(deckId) }
+    fun deleteDeck(deckName: String): Completable {
+        return updateDB { mDataSource?.deleteDeck(deckName) }
     }
 
     //todo remove later

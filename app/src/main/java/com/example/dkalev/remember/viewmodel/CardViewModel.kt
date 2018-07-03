@@ -1,6 +1,7 @@
 package com.example.dkalev.remember.model
 
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,28 +49,38 @@ class CardViewModel(dataSource: DeckDataSource) : ViewModel() {
 
     fun setTextFront(textFront: String): Completable {
         return updateDB {
-            val card = Card(mCard!!.getDeckId())
-            card.uid = mCard!!.getUid()
+            val card = Card(mCard!!.deckName)
+            card.uid = mCard!!.uid
             card.textFront = textFront
-            card.textBack = mCard!!.getTextBack()
+            card.textBack = mCard!!.textBack
             mCard = card
-            mDataSource?.updateCard(mCard)
+            mDataSource?.updateCard(mCard!!)
         }
     }
 
     fun setTextBack(textBack: String): Completable {
         return updateDB {
-            val card = Card(mCard!!.getDeckId())
-            card.uid = mCard!!.getUid()
-            card.textFront = mCard!!.getTextFront()
+            val card = Card(mCard!!.deckName)
+            card.uid = mCard!!.uid
+            card.textFront = mCard!!.textFront
             card.textBack = textBack
             mCard = card
-            mDataSource?.updateCard(mCard)
+            mDataSource?.updateCard(mCard!!)
         }
     }
 
+    fun createCard(deckName: String): Completable {
+        if (mCard == null) {
+            val card = Card(deckName)
+            card.textFront = "Front"
+            card.textBack = "Back"
+            mCard = card
+            Log.d("CardViewModel", "created new card")
+        }
+        return updateDB { mDataSource?.insertCard(mCard!!)}
+    }
 
     fun deleteCard(): Completable {
-        return updateDB { mDataSource?.deleteCard(mCard) }
+        return updateDB { mDataSource?.deleteCard(mCard!!) }
     }
 }

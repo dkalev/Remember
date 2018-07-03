@@ -1,5 +1,6 @@
 package com.example.dkalev.remember.deck
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -14,14 +15,18 @@ import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.dkalev.remember.R
 import com.example.dkalev.remember.flashcard.CardFlipFragment
-import com.example.dkalev.remember.model.DeckViewModel
-import com.example.dkalev.remember.model.Injection
+import com.example.dkalev.remember.viewmodel.DeckViewModel
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_create_deck.*
+import javax.inject.Inject
 
 class CreateDeckFragment: Fragment(){
 
-    private var viewModel: DeckViewModel? = null
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var deckViewModel: DeckViewModel
     private var d: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -30,8 +35,12 @@ class CreateDeckFragment: Fragment(){
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val vmf = Injection.provideViewModelFactory(context!!)
-        viewModel = ViewModelProviders.of(activity!!, vmf).get(DeckViewModel::class.java)
+        deckViewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(DeckViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,7 +48,7 @@ class CreateDeckFragment: Fragment(){
         newDeckButton.setOnClickListener {
             if (!TextUtils.isEmpty(deckNameEditText.text)) {
                 val deckName = deckNameEditText.text.toString()
-                d = viewModel!!
+                d = deckViewModel
                         .addDeck(deckName)
                         .subscribe({
                             //hide keyboard
@@ -65,6 +74,6 @@ class CreateDeckFragment: Fragment(){
     override fun onStop() {
         super.onStop()
         if (d != null)
-            d!!.dispose()
+            d?.dispose()
     }
 }

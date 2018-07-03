@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.dkalev.remember.R
-import com.example.dkalev.remember.model.Deck
+import com.example.dkalev.remember.model.deck.Deck
 import kotlinx.android.synthetic.main.deck_item.view.*
 
 class DecksAdapter : RecyclerView.Adapter<DecksAdapter.ViewHolder>() {
