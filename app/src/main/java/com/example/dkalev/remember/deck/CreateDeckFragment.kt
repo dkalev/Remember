@@ -1,6 +1,7 @@
 package com.example.dkalev.remember.deck
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
@@ -8,10 +9,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.dkalev.remember.R
+import com.example.dkalev.remember.flashcard.CardFlipFragment
 import com.example.dkalev.remember.model.DeckViewModel
 import com.example.dkalev.remember.model.Injection
 import io.reactivex.disposables.Disposable
@@ -28,7 +30,7 @@ class CreateDeckFragment: Fragment(){
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val vmf = Injection.provideViewModelFactory(context)
+        val vmf = Injection.provideViewModelFactory(context!!)
         viewModel = ViewModelProviders.of(activity!!, vmf).get(DeckViewModel::class.java)
     }
 
@@ -40,8 +42,13 @@ class CreateDeckFragment: Fragment(){
                 d = viewModel!!
                         .addDeck(deckName)
                         .subscribe({
-                            activity!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-                            Navigation.findNavController(view).popBackStack()
+                            //hide keyboard
+                            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm!!.hideSoftInputFromWindow(view.windowToken, 0)
+                            //get back to decks fragment
+                            val bundle = Bundle()
+                            bundle.putString(CardFlipFragment.deckNameKey, deckName)
+                            Navigation.findNavController(view).navigate(R.id.action_createDeckFragment_to_cardFlipFragment, bundle)
                         },
                                 { throwable ->
                                     Log.e("CreateDeckActivity", "Unable to add deck", throwable)

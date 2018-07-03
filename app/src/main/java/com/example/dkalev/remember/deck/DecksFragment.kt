@@ -13,12 +13,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.dkalev.remember.R
+import com.example.dkalev.remember.flashcard.CardFlipFragment
 import com.example.dkalev.remember.model.Card
 import com.example.dkalev.remember.model.DeckViewModel
 import com.example.dkalev.remember.model.Injection
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_decks.*
-import kotlinx.android.synthetic.main.content_decks.*
+import kotlinx.android.synthetic.main.deck_item.view.*
 
 class DecksFragment: Fragment() {
     
@@ -29,7 +30,7 @@ class DecksFragment: Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val vmf = Injection.provideViewModelFactory(context)
+        val vmf = Injection.provideViewModelFactory(context!!)
         viewModel = ViewModelProviders.of(activity!!, vmf).get(DeckViewModel::class.java)
     }
     
@@ -44,39 +45,42 @@ class DecksFragment: Fragment() {
         }
         setupRecyclerView(decksRecyclerView)
     }
+
     
     private fun setupRecyclerView(recyclerView: RecyclerView){
         recyclerView.adapter = DecksAdapter()
         
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        recyclerView.addOnItemTouchListener(DeckRecyclerTouchListener(context, recyclerView, object : DeckRecyclerTouchListener.ClickListener {
-            override fun onClick(view: View) {
+        recyclerView.addOnItemTouchListener(DeckRecyclerTouchListener(context!!, recyclerView, object : DeckRecyclerTouchListener.ClickListener {
+            override fun onClick(view: View?) {
                 //if you click not on item returns -1 and crashes
-                if (recyclerView.getChildAdapterPosition(view) != RecyclerView.NO_POSITION) {
+                if (recyclerView.getChildAdapterPosition(view!!) != RecyclerView.NO_POSITION) {
                     Log.d(DEBUGTAG, "click")
                     val bundle = Bundle()
-                    val deckId = view.tag as Int
-                    bundle.putInt("deckId", deckId)
+                    //todo find a better way to get the deck name
+                    val deckName = view.deckNameTextView.text.toString()
+                    bundle.putString(CardFlipFragment.deckNameKey, deckName)
                     Navigation.findNavController(view).navigate(R.id.action_decksFragment_to_cardFlipFragment, bundle)
                 }
             }
 
-            override fun onLongClick(view: View) {
+            override fun onLongClick(view: View?) {
                 Log.d(DEBUGTAG, "long click")
-                disposable.add(viewModel!!.deleteDeck(view.tag as Int)
+                disposable.add(viewModel!!.deleteDeck(view!!.deckNameTextView.text.toString())
                         .subscribe({
+//                            decksRecyclerView.adapter!!.notifyItemRemoved(view.tag as Int)
                             Toast.makeText(
                                     context,
-                                    "Deck deleted",
+                                    "Deck ${view.tag} deleted",
                                     Toast.LENGTH_LONG).show()
                         },
                                 { throwable -> Log.e(DEBUGTAG, "Unable to delete deck", throwable) }))
             }
 
-            override fun onFling(view: View, e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float) {
+            override fun onFling(view: View?, e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float) {
                 Log.d(DEBUGTAG, "fling")
-                val card = Card(view.tag as Int)
+                val card = Card(view!!.deckNameTextView.text.toString())
                 card.textFront = "Front"
                 card.textBack = "Back"
                 disposable.add(viewModel!!.addCard(card)
@@ -86,6 +90,7 @@ class DecksFragment: Fragment() {
     }
 
     private fun getAllDecks(){
+        Log.d(DEBUGTAG, "gettin deckin")
         disposable.add(viewModel!!.getAllDecks()
         !!.subscribe({decks ->
             run {
@@ -99,7 +104,7 @@ class DecksFragment: Fragment() {
 
     override fun onStart() {
         super.onStart()
-            getAllDecks()
+        getAllDecks()
     }
 
     override fun onStop() {
