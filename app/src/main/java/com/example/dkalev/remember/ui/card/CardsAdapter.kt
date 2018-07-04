@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.example.dkalev.remember.model.Card
+import com.example.dkalev.remember.model.card.Card
 import kotlinx.android.synthetic.main.fragment_card.view.*
 
 class CardsAdapter (cards: List<Card>) : RecyclerView.Adapter<CardsAdapter.ViewHolder>(){
