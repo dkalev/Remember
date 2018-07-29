@@ -1,4 +1,4 @@
-package com.example.dkalev.remember.model
+package com.example.dkalev.remember.model.card
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert

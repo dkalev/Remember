@@ -1,10 +1,12 @@
-package com.example.dkalev.remember.model
+package com.example.dkalev.remember.model.card
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.ForeignKey.CASCADE
 import android.arch.persistence.room.PrimaryKey
+import com.example.dkalev.remember.model.deck.Deck
+import java.util.*
 
 @Entity(foreignKeys = [ForeignKey(
         entity = Deck::class,
@@ -37,4 +39,16 @@ data class Card(@field:ColumnInfo(name = "deck_name")
 
     @ColumnInfo(name = "text_back")
     var textBack: String? = null
+
+    @ColumnInfo(name = "difficulty")
+    var difficulty: Double = 0.3
+
+    @ColumnInfo(name = "days_between_reviews")
+    var daysBetweenReviews: Int = 0
+
+    @ColumnInfo(name = "day_last_reviewed")
+    var dayLastReviewed: Date? = null
+
+    @ColumnInfo(name = "due_date")
+    var dueDate: Date? = null
 }

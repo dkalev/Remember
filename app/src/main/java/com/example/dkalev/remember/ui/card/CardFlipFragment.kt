@@ -1,13 +1,13 @@
-package com.example.dkalev.remember.flashcard
+package com.example.dkalev.remember.ui.card
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.graphics.PointF
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +18,7 @@ import android.view.animation.AccelerateInterpolator
 import androidx.navigation.Navigation
 import com.example.dkalev.remember.R
 import com.example.dkalev.remember.model.card.Card
-import com.example.dkalev.remember.viewmodel.DeckViewModel
+import com.example.dkalev.remember.viewmodel.CardViewModel
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_card_flip.*
@@ -28,22 +28,17 @@ class CardFlipFragment: Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: DeckViewModel
+    private lateinit var viewModel: CardViewModel
 
-    private val disposable = CompositeDisposable()
+    @Inject
+    lateinit var disposable: CompositeDisposable
+
     private val cards = ArrayList<Card>()
+    private var cardStates: ArrayList<Int>? = null
     private val cardsAdapter = CardsAdapter(cards)
     private val DEBUGTAG = "CardFlipFragment"
-    private val recyclerLayout = "CardFlipFragment.recycler.layout"
     companion object {
         const val deckNameKey = "deckName"
-    }
-    private var listState: Parcelable? = null
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(DeckViewModel::class.java)
-        setupRecyclerView()
     }
 
     override fun onAttach(context: Context?) {
@@ -51,54 +46,63 @@ class CardFlipFragment: Fragment() {
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.activity_card_flip, container, false)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(CardViewModel::class.java)
+        setupRecyclerView()
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("cardStates")){
+            cardStates = savedInstanceState.getIntegerArrayList("cardStates")
+            cardsAdapter.cardState = cardStates
+        }
+
+        val deckName = arguments!!.getString(deckNameKey)
+        fetchDeckCards(deckName)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        listState = cardRecyclerView.layoutManager!!.onSaveInstanceState()
-        outState.putParcelable(recyclerLayout, listState)
+        outState.putIntegerArrayList("cardStates", cardStates);
     }
 
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(recyclerLayout)
-        }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.activity_card_flip, container, false)
     }
 
-    override fun onResume() {
-        super.onResume()
-        val deckName = arguments!!.getString(deckNameKey)
-        fetchDeckCards(deckName)
-        if (listState != null)
-            cardRecyclerView.layoutManager!!.onRestoreInstanceState(listState)
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
     }
+
 
     private fun setupRecyclerView() {
         cardRecyclerView.adapter = cardsAdapter
 
         cardRecyclerView.layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) {
-            override fun canScrollHorizontally(): Boolean {
-                return false
+
+            override fun smoothScrollToPosition(recyclerView: RecyclerView?, state: RecyclerView.State?, position: Int) {
+
+                val smoothScroller = object: LinearSmoothScroller(context){
+                    //return a vector pointing to the next position -> to the card to the right
+                    override fun computeScrollVectorForPosition(targetPosition: Int): PointF? {
+                        return PointF(1F, 0F)
+                    }
+
+                }
+
+                smoothScroller.targetPosition = position
+                startSmoothScroll(smoothScroller)
             }
         }
-
-        cardRecyclerView.itemAnimator = object : DefaultItemAnimator() {
-            //handle disappearance by swiping the cards
-            override fun animateDisappearance(viewHolder: RecyclerView.ViewHolder, preLayoutInfo: RecyclerView.ItemAnimator.ItemHolderInfo, postLayoutInfo: RecyclerView.ItemAnimator.ItemHolderInfo?): Boolean {
-                return false
-            }
-        }
-
 
         cardRecyclerView.addOnItemTouchListener(CardRecyclerTouchListener(context!!, cardRecyclerView, object : CardRecyclerTouchListener.ClickListener {
             override fun onClick(view: FlashcardView) {
                 Log.d(DEBUGTAG, "click")
                 view.flipCard()
+                if (cardStates == null){
+                    cardStates = ArrayList()
+                }
+                    cardStates!!.add(view.tag as Int, view.side)
             }
 
             override fun onLongClick(view: FlashcardView?) {
@@ -116,51 +120,60 @@ class CardFlipFragment: Fragment() {
 
             override fun onSwipe(view: FlashcardView, swipe_type: Int) {
                 Log.d(DEBUGTAG, "fling cards: ${cards.size}")
-                if (cards.size > 1 && view.isFlipped) {
-                    if (swipe_type == CardRecyclerTouchListener.SWIPE_OUT) {
-                        view.animate()
-                                .translationX(view.translationX * 10)
-                                .translationY(view.translationY * 10)
-                                .setInterpolator(AccelerateInterpolator())
-                                .withEndAction {
-                                    cards.removeAt(0)
-                                    cardRecyclerView.adapter!!.notifyItemRemoved(0)
-                                }
-                                .start()
+                if (view.isFlipped) {
+                    if (swipe_type == CardRecyclerTouchListener.SWIPE_IN) {
+                        animateIn(view)
                     } else {
-                        view.animate()
-                                .translationX(0f)
-                                .translationY(0f)
-                                .setInterpolator(AccelerateDecelerateInterpolator())
-                                .start()
+                        animateOut(view) {
+                            val nextCardPos = view.tag as Int + 1
+                            cardRecyclerView.smoothScrollToPosition(nextCardPos)
+
+                            if (nextCardPos == cards.size)
+                                Navigation.findNavController(view).popBackStack()
+                        }
                     }
-                } else {
-                    //todo open next activity when out of cards
-                    Navigation.findNavController(view).popBackStack()
                 }
             }
         }))
     }
 
-    private fun fetchDeckCards(deckName: String) {
-        Log.d(DEBUGTAG, "fetchin da cardz...")
-        disposable.add(viewModel.getDeck(deckName)
-                .subscribe({ d ->
-                    if (d.cards!!.isEmpty()){
-                        //open edit card fragment
-                        val bundle = Bundle()
-                        bundle.putString(CardFlipFragment.deckNameKey, deckName)
-                        Navigation.findNavController(activity!!. cardRecyclerView).navigate(R.id.action_cardFlipFragment_to_editCardFragment, bundle)
-                    }
-                    cards.clear()
-                    cards.addAll(d.cards!!)
-                    cardsAdapter.notifyDataSetChanged()
-                },
-                        { throwable -> Log.e(DEBUGTAG, "Unable to fetch cards", throwable) }))
+    private fun animateIn(view: View){
+        view.animate()
+                .translationX(0f)
+                .translationY(0f)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .start()
     }
 
-    override fun onStop() {
-        super.onStop()
-        disposable.clear()
+    private fun animateOut(view: View, doAfterAnimateOut: () -> Unit){
+        view.animate()
+                .translationX(view.translationX * 10)
+                .translationY(view.translationY * 10)
+                .setInterpolator(AccelerateInterpolator())
+                .withEndAction {
+                    doAfterAnimateOut()
+                }
+                .start()
     }
+
+    private fun fetchDeckCards(deckName: String) {
+        Log.d(DEBUGTAG, "fetchin da cardz...")
+        disposable.add(
+            viewModel.getCards(deckName)
+                .subscribe({ deck ->
+                    if (deck.isEmpty())
+                        startEditCardFragment(deckName)
+
+                    cards.clear()
+                    cards.addAll(deck)
+                    cardsAdapter.notifyDataSetChanged()
+                }, { throwable -> Log.e(DEBUGTAG, "Unable to fetch cards", throwable) }))
+    }
+
+    private fun startEditCardFragment(deckName: String){
+        val bundle = Bundle()
+        bundle.putString(CardFlipFragment.deckNameKey, deckName)
+        Navigation.findNavController(activity!!. cardRecyclerView).navigate(R.id.action_cardFlipFragment_to_editCardFragment, bundle)
+    }
+
 }

@@ -7,23 +7,27 @@
 
     <fragment
         android:id="@+id/cardFlipFragment"
-        android:name="com.example.dkalev.remember.flashcard.CardFlipFragment"
+        android:name="com.example.dkalev.remember.ui.card.CardFlipFragment"
         android:label="CardFlipFragment" >
         <argument
-            android:name="deckId"
-            android:defaultValue="0"
-            app:type="integer" />
+            android:name="deckName"
+            android:defaultValue="empty"
+            app:type="string" />
         <action
             android:id="@+id/action_cardFlipFragment_to_editCardFragment"
             app:destination="@id/editCardFragment" />
     </fragment>
     <fragment
         android:id="@+id/createDeckFragment"
-        android:name="com.example.dkalev.remember.deck.CreateDeckFragment"
-        android:label="CreateDeckFragment" ></fragment>
+        android:name="com.example.dkalev.remember.ui.deck.CreateDeckFragment"
+        android:label="CreateDeckFragment" >
+        <action
+            android:id="@+id/action_createDeckFragment_to_cardFlipFragment"
+            app:destination="@id/cardFlipFragment" app:popUpTo="@id/decksFragment"/>
+    </fragment>
     <fragment
         android:id="@+id/decksFragment"
-        android:name="com.example.dkalev.remember.deck.DecksFragment"
+        android:name="com.example.dkalev.remember.ui.deck.DecksFragment"
         android:label="DecksFragment" >
         <action
             android:id="@+id/action_decksFragment_to_createDeckFragment"
@@ -35,15 +39,19 @@
     </fragment>
     <fragment
         android:id="@+id/editCardFragment"
-        android:name="com.example.dkalev.remember.flashcard.EditCardFragment"
+        android:name="com.example.dkalev.remember.ui.card.EditCardFragment"
         android:label="EditCardFragment" >
         <argument
             android:name="cardUid"
-            android:defaultValue="0"
+            android:defaultValue="-1"
             app:type="integer" />
         <argument
             android:name="cardSide"
             android:defaultValue="0"
             app:type="integer" />
+        <argument
+            android:name="deckName"
+            android:defaultValue="empty"
+            app:type="string" />
     </fragment>
 </navigation>

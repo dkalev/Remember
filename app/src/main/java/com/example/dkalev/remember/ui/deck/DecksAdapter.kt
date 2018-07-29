@@ -1,4 +1,4 @@
-package com.example.dkalev.remember.deck
+package com.example.dkalev.remember.ui.deck
 
 import android.os.Build
 import android.support.v7.util.DiffUtil
@@ -57,7 +57,6 @@ class DecksAdapter : RecyclerView.Adapter<DecksAdapter.ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
         val deckItemView = LayoutInflater.from(parent.context).inflate(R.layout.deck_item, parent, false)
         return ViewHolder(deckItemView)
     }

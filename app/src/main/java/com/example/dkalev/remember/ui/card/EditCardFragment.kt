@@ -1,4 +1,4 @@
-package com.example.dkalev.remember.flashcard
+package com.example.dkalev.remember.ui.card
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -28,9 +28,10 @@ class EditCardFragment: Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-
     private lateinit var cardViewModel: CardViewModel
-    private val disposable = CompositeDisposable()
+
+    @Inject
+    lateinit var disposable: CompositeDisposable
 
     private var cardUid = 0
     private var cardSide = 0
@@ -38,14 +39,24 @@ class EditCardFragment: Fragment() {
 
     private val DEBUGTAG = "EditCardFragment"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.activity_edit_card, container, false)
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         cardViewModel = ViewModelProviders.of(this, viewModelFactory).get(CardViewModel::class.java)
 
+        initEditTextViews()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.activity_edit_card, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
         cardUid = arguments!!.get("cardUid") as Int
         cardSide = arguments!!.get("cardSide") as Int
         deckName = arguments!!.get(CardFlipFragment.deckNameKey) as String
@@ -54,8 +65,14 @@ class EditCardFragment: Fragment() {
             createCard(deckName)
         else
             getCard(cardUid)
+    }
 
+    override fun onStop() {
+        super.onStop()
+        disposable.clear()
+    }
 
+    private fun initEditTextViews(){
         cardFrontEditText!!.maxLines = 1
         cardFrontEditText!!.inputType = InputType.TYPE_CLASS_TEXT
         cardBackEditText!!.maxLines = 1
@@ -73,10 +90,6 @@ class EditCardFragment: Fragment() {
         }
     }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        AndroidSupportInjection.inject(this)
-    }
 
     private fun getCard(card_uid: Int) {
         Log.d(DEBUGTAG, "card uid: $card_uid")
@@ -104,7 +117,6 @@ class EditCardFragment: Fragment() {
 
     private fun updateTextFront(textFront: String, v: View) {
         disposable.add(cardViewModel.setTextFront(textFront)
-//                .autoDisposable()
                 .subscribe({
                     Toast.makeText(
                             context,
@@ -124,13 +136,7 @@ class EditCardFragment: Fragment() {
                             Toast.LENGTH_LONG).show()
                     Navigation.findNavController(v).popBackStack()
 
-                }
-                ) { throwable -> Log.e(DEBUGTAG, "Unable to update text back", throwable) })
-    }
-
-    override fun onStop() {
-        super.onStop()
-        disposable.clear()
+                }) { throwable -> Log.e(DEBUGTAG, "Unable to update text back", throwable) })
     }
 
     private inner class TextEditorActionListener : TextView.OnEditorActionListener {
@@ -144,9 +150,7 @@ class EditCardFragment: Fragment() {
                             event.keyCode == KeyEvent.KEYCODE_ENTER)) {
                 if (event == null || !event.isShiftPressed) {
                     // the user is done typing.
-                    //hide the keyboard
-                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    hideKeyboard(v)
                     updateCard(v.text.toString(), v)
                     return true // consume.
                 }
@@ -170,5 +174,10 @@ class EditCardFragment: Fragment() {
                 //updateCard((v as TextView).text.toString(), v)
             }
         }
+    }
+
+    private fun hideKeyboard(view: View){
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

@@ -1,4 +1,4 @@
-package com.example.dkalev.remember
+package com.example.dkalev.remember.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider

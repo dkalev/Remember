@@ -1,4 +1,13 @@
 package com.example.dkalev.remember.di
 
-class MainActivityModule {
+import com.example.dkalev.remember.MainActivity
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
+
+@Suppress("unused")
+@Module
+abstract class MainActivityModule {
+
+    @ContributesAndroidInjector(modules = [FragmentBuildersModule::class])
+    abstract fun contributeMainActivity(): MainActivity
 }

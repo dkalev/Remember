@@ -1,9 +1,11 @@
-package com.example.dkalev.remember.model
+package com.example.dkalev.remember.model.deck
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
+import com.example.dkalev.remember.model.card.Card
 import io.reactivex.Flowable
+import java.util.*
 
 @Dao
 interface DeckDao {
@@ -22,4 +24,7 @@ interface DeckDao {
 
     @Query("SELECT * FROM card WHERE :deckName == deck_name")
     fun getCards(deckName: String): Flowable<List<Card>>
+
+    @Query("SELECT * FROM card WHERE :deckName == deck_name AND :date >= due_date")
+    fun getDueCards(deckName: String, date: Date): Flowable<List<Card>>
 }

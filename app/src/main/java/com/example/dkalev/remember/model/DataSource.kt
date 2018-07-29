@@ -1,8 +1,10 @@
 package com.example.dkalev.remember.model
 
+import com.example.dkalev.remember.model.card.Card
+import com.example.dkalev.remember.model.deck.Deck
 import io.reactivex.Flowable
 
-interface DeckDataSource {
+interface DataSource {
 
     val allDecks: Flowable<List<Deck>>
 
